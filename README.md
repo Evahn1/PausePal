@@ -1,3 +1,2 @@
 # PausePal
-#School Project for WPI 
-#First time making a webstite!!
+#School Project for WPI  First time making a webstite!!
