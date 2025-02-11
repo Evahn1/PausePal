@@ -152,7 +152,7 @@ saveButton.addEventListener("mouseout", () => {
 saveButton.addEventListener("click", () => {
     const notes = textArea.value;
 
-    fetch('http://localhost:3000/saveNotes', {
+    fetch('https://pausepal.onrender.com/saveNotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: currentUser, notes }) // Send username + notes
@@ -237,7 +237,7 @@ loginButton.addEventListener("click", async () => {
         currentUser = username; // Store username globally
 
         // Load user's saved notes
-        fetch('http://localhost:3000/loadNotes', {
+        fetch('https://pausepal.onrender.com/loadNotes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username })
@@ -287,7 +287,7 @@ function logout(){
 }
 
 function register(username, password) {
-    fetch('http://localhost:3000/register', {
+    fetch('https://pausepal.onrender.com/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -306,7 +306,7 @@ function register(username, password) {
 
 
 function login(username, password) {
-    return fetch('http://localhost:3000/login', {
+    return fetch('https://pausepal.onrender.com/login', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({username, password})
