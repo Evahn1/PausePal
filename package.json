@@ -14,7 +14,9 @@
   },
   "main": "index.js",
   "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "esbuild": "^0.21.5",
     "express": "^4.21.2",
     "inquirer": "^12.4.1",

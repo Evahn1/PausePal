@@ -1,128 +1,131 @@
-import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
+import { createClient } from '@supabase/supabase-js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors()); // CORS middleware must be used after app is initialized
+// Supabase credentials - replace these with your actual values
+const SUPABASE_URL = 'https://zhtfixdrzgwnsbsjbzin.supabase.co'; // Your Supabase URL
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpodGZpeGRyemd3bnNic2piemluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1NjQzNDcsImV4cCI6MjA1NTE0MDM0N30.aTz8xYUGNaGJL96LQD3oXvIBRS8oBsP4SZAIdE9mg24'; // Your Supabase API Key
+
+// Initialize Supabase client
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+app.use(cors());
 app.use(express.json());
 
-const USERS_FILE = 'users.txt';
-const NOTES_FILE = 'notes.txt';
-// Helper functions for encoding/decoding in base64
-const encodeBase64 = (text) => Buffer.from(text, 'utf8').toString('base64');
-const decodeBase64 = (text) => Buffer.from(text, 'base64').toString('utf8');
-
-// Register a user
-app.post('/register', (req, res) => {
+// Create a new user
+app.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-        return res.send("Username and password are required.");
+        return res.status(400).send("Username and password are required.");
     }
 
-    // Ensure the users.txt file exists
-    if (!fs.existsSync(USERS_FILE)) {
-        fs.writeFileSync(USERS_FILE, "");
+    // Create a new user in Supabase authentication
+    const { user, error } = await supabase.auth.signUp({
+        email: username, // Using email as username
+        password: password,
+    });
+
+    if (error) {
+        return res.status(400).send(error.message);
     }
 
-    // Read existing users
-    const users = fs.readFileSync(USERS_FILE, 'utf8').trim().split('\n').filter(line => line);
+    // Optionally, create a profile for the user in another table (e.g., notes table)
+    await supabase.from('profiles').insert([{ user_id: user.id, username }]);
 
-    // Encode credentials to base64
-    const encodedUsername = encodeBase64(username);
-    const encodedPassword = encodeBase64(password);
-
-    // Check if username already exists
-    for (let user of users) {
-        const [existingUsername, existingPassword] = user.split(':');
-        if (existingUsername === encodedUsername) {
-            return res.send("Username already exists!");
-        }
-    }
-
-    // Save the new user
-    const newUser = `${encodedUsername}:${encodedPassword}\n`;
-    fs.appendFileSync(USERS_FILE, newUser);
     res.send("User registered successfully!");
 });
 
 // Login a user
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    const users = fs.readFileSync(USERS_FILE, 'utf8').split('\n').filter(line => line);
-
-    // Encode the input username and password to base64
-    const encodedUsername = encodeBase64(username);
-    const encodedPassword = encodeBase64(password);
-
-    // Check if the credentials match
-    for (let user of users) {
-        const [storedUsername, storedPassword] = user.split(':');
-        if (storedUsername === encodedUsername && storedPassword === encodedPassword) {
-            return res.send("Login successful!");
-        }
+    if (!username || !password) {
+        return res.status(400).send("Username and password are required.");
     }
 
-    res.send("Invalid username or password.");
+    // Sign in using Supabase authentication
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: username, // Using email as username
+        password: password,
+    });
+
+    if (error) {
+        return res.status(401).send("Invalid username or password.");
+    }
+
+    res.send("Login successful!");
 });
 
-app.post('/saveNotes', (req, res) => {
+// Save Notes for the logged-in user
+app.post('/saveNotes', async (req, res) => {
     const { username, notes } = req.body;
 
-    if (!username) {
-        return res.send("User not found.");
+    if (!username || !notes) {
+        return res.status(400).send("Username and notes are required.");
     }
 
-    // Ensure notes.txt file exists
-    if (!fs.existsSync(NOTES_FILE)) {
-        fs.writeFileSync(NOTES_FILE, "");
+    // Fetch user ID from the username
+    const { data: userData, error } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('username', username)
+        .single();
+
+    if (error || !userData) {
+        return res.status(404).send("User not found.");
     }
 
-    // Read existing notes, remove old note for the user
-    let notesData = fs.readFileSync(NOTES_FILE, 'utf8')
-        .split('\n')
-        .filter(line => !line.startsWith(username + ":"));
+    const userId = userData.user_id;
 
-    // Encode notes to base64 to handle multi-line content safely
-    const encodedNotes = Buffer.from(notes, 'utf8').toString('base64');
-
-    // Append the new note
-    notesData.push(`${username}:${encodedNotes}`);
-
-    // Write back to the file
-    fs.writeFileSync(NOTES_FILE, notesData.join('\n'));
+    // Save notes for the user in a 'notes' table
+    await supabase
+        .from('notes')
+        .upsert([{ user_id: userId, notes }]);
 
     res.send("Notes saved successfully!");
 });
 
-app.post('/loadNotes', (req, res) => {
+// Load Notes for a user
+app.post('/loadNotes', async (req, res) => {
     const { username } = req.body;
 
-    if (!fs.existsSync(NOTES_FILE)) {
-        return res.send("");
+    if (!username) {
+        return res.status(400).send("Username is required.");
     }
 
-    const notes = fs.readFileSync(NOTES_FILE, 'utf8')
-        .split('\n')
-        .find(line => line.startsWith(username + ":"));
+    // Fetch user ID from the username
+    const { data: userData, error } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('username', username)
+        .single();
 
-    if (!notes) {
-        return res.send("");
+    if (error || !userData) {
+        return res.status(404).send("User not found.");
     }
 
-    // Extract and decode base64 note content
-    const encodedNotes = notes.split(':').slice(1).join(':'); // Handle colons safely
-    const decodedNotes = Buffer.from(encodedNotes, 'base64').toString('utf8');
+    const userId = userData.user_id;
 
-    res.send(decodedNotes);
+    // Fetch notes for the user from the 'notes' table
+    const { data: notesData, error: notesError } = await supabase
+        .from('notes')
+        .select('notes')
+        .eq('user_id', userId)
+        .single();
+
+    if (notesError || !notesData) {
+        return res.status(404).send("No notes found for this user.");
+    }
+
+    res.send(notesData.notes);
 });
 
 app.get("/", (req, res) => {
     res.send("Server is running!");
 });
-
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
