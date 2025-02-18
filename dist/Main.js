@@ -305,7 +305,7 @@ registerBtn.addEventListener("click", () => {
 
     // Optional: Validate fields here
 
-    register(registerUsernameInput.value, registerPasswordInput.value, registerEmailInput.value);
+    register(username, password, email);
 
 });
 
