@@ -20,15 +20,14 @@ app.use(express.json());
 
 // Create a new user
 app.post('/register', async (req, res) => {
-    const { username, password } = req.body;
+    const { email, username, password } = req.body;
 
-    if (!username || !password) {
-        return res.status(400).send("Username and password are required.");
+    if (!email || !username || !password) {
+        return res.status(400).send("Email, username, and password are required.");
     }
 
-    // Create a new user in Supabase authentication
     const { data, error } = await supabase.auth.signUp({
-        email: username, // Using email as username
+        email: email,
         password: password,
     });
 
@@ -36,11 +35,11 @@ app.post('/register', async (req, res) => {
         return res.status(400).send(error.message);
     }
 
-    // Optionally, create a profile for the user in another table (e.g., profiles table)
     await supabase.from('profiles').insert([{ user_id: data.user.id, username }]);
 
     res.send("User registered successfully!");
 });
+
 
 // Login a user
 app.post('/login', async (req, res) => {

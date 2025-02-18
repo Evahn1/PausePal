@@ -1,7 +1,14 @@
-// Create a container for the notepad
+// ============
+// Global Variables
+// ============
+let currentUser = null;
+
+// ============
+// Task Manager / Notepad Screen
+// ============
 const notepadContainer = document.createElement("div");
 
-// Create a label for the notepad
+// Label for the notepad (optional)
 const label = document.createElement("label");
 label.htmlFor = "notepad";
 
@@ -30,8 +37,7 @@ textArea.addEventListener("blur", () => {
     textArea.style.border = "2px solid #ccc"; // Revert when not active
 });
 
-
-// Load saved notes from localStorage
+// Load saved notes from localStorage (if desired)
 textArea.value = localStorage.getItem("savedNotes") || "";
 
 // Log Out Button
@@ -52,7 +58,7 @@ logOutButton.style.cursor = "pointer";
 logOutButton.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)"; // Subtle shadow
 logOutButton.style.transition = "0.3s"; // Smooth transition effect
 
-// Hover effect
+// Hover effect for Logout button
 logOutButton.addEventListener("mouseover", () => {
     logOutButton.style.opacity = "0.8";
 });
@@ -64,7 +70,6 @@ logOutButton.addEventListener("mouseout", () => {
 logOutButton.addEventListener("click", () => {
     logout(); // Call the logout function
 });
-
 
 // Save Button
 const saveButton = document.createElement("button");
@@ -84,7 +89,7 @@ saveButton.style.cursor = "pointer";
 saveButton.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)";
 saveButton.style.transition = "0.3s";
 
-// Hover effect
+// Hover effect for Save button
 saveButton.addEventListener("mouseover", () => {
     saveButton.style.opacity = "0.8";
 });
@@ -92,6 +97,7 @@ saveButton.addEventListener("mouseout", () => {
     saveButton.style.opacity = "1";
 });
 
+// Save notes on click
 saveButton.addEventListener("click", () => {
     const notes = textArea.value;
 
@@ -108,15 +114,15 @@ saveButton.addEventListener("click", () => {
         });
 });
 
-
-
-// Append elements to the container
+// Append elements to the notepad container
 notepadContainer.append(logOutButton);
 notepadContainer.appendChild(textArea);
 notepadContainer.appendChild(label);
 notepadContainer.appendChild(saveButton);
 
-// Container for login screen
+// ============
+// Login Screen Container
+// ============
 const loginContainer = document.createElement("div");
 loginContainer.style.width = "300px";
 loginContainer.style.margin = "100px auto"; // Center the container
@@ -128,7 +134,7 @@ loginContainer.style.display = "flex";
 loginContainer.style.flexDirection = "column";
 loginContainer.style.gap = "10px";
 
-// Username Input
+// Username Input for Login
 const usernameInput = document.createElement("input");
 usernameInput.type = "text";
 usernameInput.placeholder = "Enter username";
@@ -138,40 +144,128 @@ usernameInput.style.border = "1px solid #ccc";
 usernameInput.style.borderRadius = "5px";
 usernameInput.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 
-// Password Input
+// Password Input for Login
 const passwordInput = document.createElement("input");
 passwordInput.type = "password";
 passwordInput.placeholder = "Enter password";
 passwordInput.style.fontSize = "16px";
 passwordInput.style.padding = "10px";
+passwordInput.style.border = "1px solid #ccc";
 passwordInput.style.borderRadius = "5px";
 passwordInput.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
-passwordInput.style.border = "1px solid #ccc";
 
-// Login button
-const loginButton = document.createElement("button");
-loginButton.innerText = "Login";
-loginButton.style.padding = "10px";
-loginButton.style.fontSize = "16px";
-loginButton.style.border = "none";
-loginButton.style.borderRadius = "5px";
-loginButton.style.backgroundColor = "#007bff";
-loginButton.style.color = "white";
-loginButton.style.cursor = "pointer";
+// Login Button
+const loginBtn = document.createElement("button");
+loginBtn.innerText = "Login";
+loginBtn.style.padding = "10px";
+loginBtn.style.fontSize = "16px";
+loginBtn.style.border = "none";
+loginBtn.style.borderRadius = "5px";
+loginBtn.style.backgroundColor = "#007bff";
+loginBtn.style.color = "white";
+loginBtn.style.cursor = "pointer";
 
-// Register button
-const registerButton = document.createElement("button");
-registerButton.innerText = "Register";
-registerButton.style.padding = "10px";
-registerButton.style.fontSize = "16px";
-registerButton.style.border = "none";
-registerButton.style.borderRadius = "5px";
-registerButton.style.backgroundColor = "#28a745";
-registerButton.style.color = "white";
-registerButton.style.cursor = "pointer";
+// Button to switch to Registration Screen
+const goToRegisterButton = document.createElement("button");
+goToRegisterButton.innerText = "Register";
+goToRegisterButton.style.padding = "10px";
+goToRegisterButton.style.fontSize = "16px";
+goToRegisterButton.style.border = "none";
+goToRegisterButton.style.borderRadius = "5px";
+goToRegisterButton.style.backgroundColor = "#28a745";
+goToRegisterButton.style.color = "white";
+goToRegisterButton.style.cursor = "pointer";
 
-// Event listener for login button
-loginButton.addEventListener("click", async () => {
+// Append login elements to login container
+loginContainer.appendChild(usernameInput);
+loginContainer.appendChild(passwordInput);
+loginContainer.appendChild(loginBtn);
+loginContainer.appendChild(goToRegisterButton);
+
+// ============
+// Registration Screen Container
+// ============
+const registerContainer = document.createElement("div");
+registerContainer.style.width = "300px";
+registerContainer.style.margin = "100px auto";
+registerContainer.style.padding = "20px";
+registerContainer.style.border = "1px solid #ccc";
+registerContainer.style.borderRadius = "10px";
+registerContainer.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+registerContainer.style.display = "flex";
+registerContainer.style.flexDirection = "column";
+registerContainer.style.gap = "10px";
+// Hide registration screen by default
+registerContainer.style.display = "none";
+
+// Email Input for Registration
+const emailInput = document.createElement("input");
+emailInput.type = "email";
+emailInput.placeholder = "Enter email address";
+emailInput.style.fontSize = "16px";
+emailInput.style.padding = "10px";
+emailInput.style.border = "1px solid #ccc";
+emailInput.style.borderRadius = "5px";
+
+// Username Input for Registration
+const regUsernameInput = document.createElement("input");
+regUsernameInput.type = "text";
+regUsernameInput.placeholder = "Enter username";
+regUsernameInput.style.fontSize = "16px";
+regUsernameInput.style.padding = "10px";
+regUsernameInput.style.border = "1px solid #ccc";
+regUsernameInput.style.borderRadius = "5px";
+
+// Password Input for Registration
+const regPasswordInput = document.createElement("input");
+regPasswordInput.type = "password";
+regPasswordInput.placeholder = "Enter password";
+regPasswordInput.style.fontSize = "16px";
+regPasswordInput.style.padding = "10px";
+regPasswordInput.style.border = "1px solid #ccc";
+regPasswordInput.style.borderRadius = "5px";
+
+// Registration Button
+const registerBtn = document.createElement("button");
+registerBtn.innerText = "Register";
+registerBtn.style.padding = "10px";
+registerBtn.style.fontSize = "16px";
+registerBtn.style.border = "none";
+registerBtn.style.borderRadius = "5px";
+registerBtn.style.backgroundColor = "#28a745";
+registerBtn.style.color = "white";
+registerBtn.style.cursor = "pointer";
+
+// Back Button to return to Login Screen
+const backToLoginButton = document.createElement("button");
+backToLoginButton.innerText = "Back to Login";
+backToLoginButton.style.padding = "10px";
+backToLoginButton.style.fontSize = "16px";
+backToLoginButton.style.border = "none";
+backToLoginButton.style.borderRadius = "5px";
+backToLoginButton.style.backgroundColor = "#6c757d";
+backToLoginButton.style.color = "white";
+backToLoginButton.style.cursor = "pointer";
+
+// Append registration elements to registration container
+registerContainer.appendChild(emailInput);
+registerContainer.appendChild(regUsernameInput);
+registerContainer.appendChild(regPasswordInput);
+registerContainer.appendChild(registerBtn);
+registerContainer.appendChild(backToLoginButton);
+
+// ============
+// Append Containers to Body
+// ============
+document.body.appendChild(loginContainer);
+document.body.appendChild(registerContainer);
+
+// ============
+// Event Listeners and Functions
+// ============
+
+// ----- Login Event -----
+loginBtn.addEventListener("click", async () => {
     const username = usernameInput.value;
     const password = passwordInput.value;
 
@@ -179,7 +273,7 @@ loginButton.addEventListener("click", async () => {
     if (isLoggedIn) {
         currentUser = username; // Store username globally
 
-        // Load user's saved notes
+        // Load user's saved notes from backend
         fetch('https://pausepal.onrender.com/loadNotes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -194,89 +288,94 @@ loginButton.addEventListener("click", async () => {
                 console.error("Failed to load notes:", err);
                 loadTaskManager();
             });
-    } else {
     }
 });
 
-
-
-
-// Event listener for register button
-registerButton.addEventListener("click", () => {
-    register(usernameInput.value, passwordInput.value);
+// ----- Switch to Registration Screen -----
+goToRegisterButton.addEventListener("click", () => {
+    loginContainer.style.display = "none";
+    registerContainer.style.display = "flex";
 });
 
-// Append elements to the container
-loginContainer.appendChild(usernameInput);
-loginContainer.appendChild(passwordInput);
-loginContainer.appendChild(loginButton);
-loginContainer.appendChild(registerButton);
+// ----- Registration Event -----
+registerBtn.addEventListener("click", () => {
+    const email = emailInput.value;
+    const username = regUsernameInput.value;
+    const password = regPasswordInput.value;
 
-document.body.appendChild(loginContainer);
+    // Optional: Validate fields here
 
+    registerUser(email, username, password);
+});
 
+// ----- Back to Login from Registration Screen -----
+backToLoginButton.addEventListener("click", () => {
+    registerContainer.style.display = "none";
+    loginContainer.style.display = "flex";
+});
+
+// ----- Load Task Manager Screen -----
 function loadTaskManager() {
-    document.body.innerHTML = "";
-    const heading = document.createElement("h1");
-    heading.innerText = "Task Manager";
-//Append notepad container to body
+    document.body.innerHTML = ""; // Clear the body
     document.body.appendChild(notepadContainer);
-
 }
 
-function logout(){
+// ----- Logout Function -----
+function logout() {
     document.body.innerHTML = "";
+    // Reset fields if needed
+    usernameInput.value = "";
+    passwordInput.value = "";
+    emailInput.value = "";
+    regUsernameInput.value = "";
+    regPasswordInput.value = "";
     document.body.appendChild(loginContainer);
+    // Optionally, clear currentUser
+    currentUser = null;
 }
 
-function register(username, password) {
+// ----- Registration Function -----
+function registerUser(email, username, password) {
+    // Ensure your server's /register endpoint handles an 'email' field
     fetch('https://pausepal.onrender.com/register', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, username, password })
     })
         .then(response => response.text())
-        .then(data => alert(data))
+        .then(data => {
+            alert(data);
+            // After successful registration, switch back to login screen
+            registerContainer.style.display = "none";
+            loginContainer.style.display = "flex";
+        })
         .catch(error => {
             console.error('Registration failed:', error);
             alert('Registration failed. Check console for details.');
         });
 }
 
-
-
-
+// ----- Login Function -----
 function login(username, password) {
     return fetch('https://pausepal.onrender.com/login', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username, password})
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
     })
-        .then(response => response.text()) // Get the response text
+        .then(response => response.text())
         .then(data => {
             if (data === "Login successful!") {
+                // Clear input fields
                 usernameInput.value = "";
                 passwordInput.value = "";
-                return true; // Resolve promise with true for successful login
+                return true;
             } else {
-                alert(data); // Show error message
-                return false; // Resolve promise with false for failed login
+                alert(data);
+                return false;
             }
         })
         .catch(err => {
             console.error("Login request failed:", err);
-            return false; // Return false in case of error
+            return false;
         });
 }
-
-
-
-
-
-
-
-
-
-
