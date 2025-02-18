@@ -1,13 +1,16 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+
+dotenv.config(); // Load environment variables
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Supabase credentials - replace these with your actual values
-const SUPABASE_URL = 'https://zhtfixdrzgwnsbsjbzin.supabase.co'; // Your Supabase URL
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpodGZpeGRyemd3bnNic2piemluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1NjQzNDcsImV4cCI6MjA1NTE0MDM0N30.aTz8xYUGNaGJL96LQD3oXvIBRS8oBsP4SZAIdE9mg24'; // Your Supabase API Key
+// Supabase credentials from environment variables
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 // Initialize Supabase client
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -24,7 +27,7 @@ app.post('/register', async (req, res) => {
     }
 
     // Create a new user in Supabase authentication
-    const { user, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
         email: username, // Using email as username
         password: password,
     });
@@ -33,8 +36,8 @@ app.post('/register', async (req, res) => {
         return res.status(400).send(error.message);
     }
 
-    // Optionally, create a profile for the user in another table (e.g., notes table)
-    await supabase.from('profiles').insert([{ user_id: user.id, username }]);
+    // Optionally, create a profile for the user in another table (e.g., profiles table)
+    await supabase.from('profiles').insert([{ user_id: data.user.id, username }]);
 
     res.send("User registered successfully!");
 });
@@ -124,6 +127,7 @@ app.post('/loadNotes', async (req, res) => {
     res.send(notesData.notes);
 });
 
+// Simple test endpoint
 app.get("/", (req, res) => {
     res.send("Server is running!");
 });
