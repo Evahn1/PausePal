@@ -305,7 +305,8 @@ registerBtn.addEventListener("click", () => {
 
     // Optional: Validate fields here
 
-    registerUser(email, username, password);
+    register(registerUsernameInput.value, registerPasswordInput.value, registerEmailInput.value);
+
 });
 
 // ----- Back to Login from Registration Screen -----
@@ -335,20 +336,17 @@ function logout() {
 }
 
 // ----- Registration Function -----
-function registerUser(email, username, password) {
-    // Ensure your server's /register endpoint handles an 'email' field
+function register(username, password, email) {
+    // Send both username and email to the backend for registration
     fetch('https://pausepal.onrender.com/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, username, password })
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, email, password })
     })
         .then(response => response.text())
-        .then(data => {
-            alert(data);
-            // After successful registration, switch back to login screen
-            registerContainer.style.display = "none";
-            loginContainer.style.display = "flex";
-        })
+        .then(data => alert(data))
         .catch(error => {
             console.error('Registration failed:', error);
             alert('Registration failed. Check console for details.');
