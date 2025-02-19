@@ -38,7 +38,8 @@ app.post('/register', async (req, res) => {
         return res.status(400).send(error.message);
     }
 
-    await supabase.from('profiles').insert([{ user_id: data.user.id, username }]);
+    await supabase.from('profiles').insert([{ user_id: data.user.id, username, email }]);
+
 
     res.send("User registered successfully!");
 });
@@ -52,9 +53,22 @@ app.post('/login', async (req, res) => {
         return res.status(400).send("Username and password are required.");
     }
 
-    // Sign in using Supabase authentication
+    // First, fetch the email corresponding to the display name (username)
+    const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('username', username)
+        .single();
+
+    if (profileError || !profile) {
+        return res.status(404).send("User not found.");
+    }
+
+    const email = profile.email;
+
+    // Now sign in using the retrieved email and the provided password
     const { data, error } = await supabase.auth.signInWithPassword({
-        email: username, // Using email as username
+        email: email,
         password: password,
     });
 
@@ -64,6 +78,7 @@ app.post('/login', async (req, res) => {
 
     res.send("Login successful!");
 });
+
 
 // Save Notes for the logged-in user
 app.post('/saveNotes', async (req, res) => {
