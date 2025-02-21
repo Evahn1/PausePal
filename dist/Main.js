@@ -104,7 +104,7 @@ saveButton.addEventListener("click", () => {
     fetch('https://pausepal.onrender.com/saveNotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: currentUser, notes }) // Send username + notes
+        body: JSON.stringify({ email: currentUser, notes }) // Send email + notes
     })
         .then(response => response.text())
         .then(data => alert(data))
@@ -134,15 +134,15 @@ loginContainer.style.display = "flex";
 loginContainer.style.flexDirection = "column";
 loginContainer.style.gap = "10px";
 
-// Username Input for Login
-const usernameInput = document.createElement("input");
-usernameInput.type = "text";
-usernameInput.placeholder = "Enter username";
-usernameInput.style.fontSize = "16px";
-usernameInput.style.padding = "10px";
-usernameInput.style.border = "1px solid #ccc";
-usernameInput.style.borderRadius = "5px";
-usernameInput.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+// Email Input for Login
+const loginEmailInput = document.createElement("input");
+loginEmailInput.type = "email";
+loginEmailInput.placeholder = "Enter email address";
+loginEmailInput.style.fontSize = "16px";
+loginEmailInput.style.padding = "10px";
+loginEmailInput.style.border = "1px solid #ccc";
+loginEmailInput.style.borderRadius = "5px";
+loginEmailInput.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 
 // Password Input for Login
 const passwordInput = document.createElement("input");
@@ -177,7 +177,7 @@ goToRegisterButton.style.color = "white";
 goToRegisterButton.style.cursor = "pointer";
 
 // Append login elements to login container
-loginContainer.appendChild(usernameInput);
+loginContainer.appendChild(loginEmailInput);
 loginContainer.appendChild(passwordInput);
 loginContainer.appendChild(loginBtn);
 loginContainer.appendChild(goToRegisterButton);
@@ -206,8 +206,6 @@ emailInput.style.fontSize = "16px";
 emailInput.style.padding = "10px";
 emailInput.style.border = "1px solid #ccc";
 emailInput.style.borderRadius = "5px";
-
-// Removed the username input from registration
 
 // Password Input for Registration
 const regPasswordInput = document.createElement("input");
@@ -258,18 +256,18 @@ document.body.appendChild(registerContainer);
 
 // ----- Login Event -----
 loginBtn.addEventListener("click", async () => {
-    const username = usernameInput.value;
+    const email = loginEmailInput.value;
     const password = passwordInput.value;
 
-    const isLoggedIn = await login(username, password);
+    const isLoggedIn = await login(email, password);
     if (isLoggedIn) {
-        currentUser = username; // Store username globally
+        currentUser = email; // Store email globally
 
         // Load user's saved notes from backend
         fetch('https://pausepal.onrender.com/loadNotes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
+            body: JSON.stringify({ email })
         })
             .then(response => response.text())
             .then(notes => {
@@ -290,7 +288,6 @@ goToRegisterButton.addEventListener("click", () => {
 });
 
 // ----- Registration Event -----
-// Now only email and password are required for registration
 registerBtn.addEventListener("click", () => {
     const email = emailInput.value;
     const password = regPasswordInput.value;
@@ -316,7 +313,7 @@ function loadTaskManager() {
 function logout() {
     document.body.innerHTML = "";
     // Reset fields if needed
-    usernameInput.value = "";
+    loginEmailInput.value = "";
     passwordInput.value = "";
     emailInput.value = "";
     regPasswordInput.value = "";
@@ -326,7 +323,6 @@ function logout() {
 }
 
 // ----- Registration Function -----
-// Updated to send only email and password
 function register(email, password) {
     fetch('https://pausepal.onrender.com/register', {
         method: 'POST',
@@ -344,17 +340,17 @@ function register(email, password) {
 }
 
 // ----- Login Function -----
-function login(username, password) {
+function login(email, password) {
     return fetch('https://pausepal.onrender.com/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password })
     })
         .then(response => response.text())
         .then(data => {
             if (data === "Login successful!") {
                 // Clear input fields
-                usernameInput.value = "";
+                loginEmailInput.value = "";
                 passwordInput.value = "";
                 return true;
             } else {
