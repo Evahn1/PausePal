@@ -73,12 +73,11 @@ app.post('/login', async (req, res) => {
 app.post('/saveNotes', async (req, res) => {
     try {
         const { email, notes } = req.body;
-
         if (!email || !notes) {
             return res.status(400).send("Email and notes are required.");
         }
 
-        // 1. Fetch user_id from the profiles table using email
+        // 1. Fetch user_id
         const { data: userData, error: userError } = await supabase
             .from('profiles')
             .select('user_id')
@@ -91,22 +90,14 @@ app.post('/saveNotes', async (req, res) => {
 
         const userId = userData.user_id;
 
-        // 2. Upsert notes for the user in the 'notes' table
-        //    This will insert a new row if none exists for that user_id,
-        //    or update if there's already one.
+        // 2. Upsert notes
         const { data: notesResult, error: notesError } = await supabase
             .from('notes')
-            .upsert(
-                [
-                    {
-                        user_id: userId,
-                        notes: notes,
-                    }
-                ],
-                // If you have a unique constraint on user_id in the notes table,
-                // Supabase will handle conflicts automatically. If not, specify:
-                // { onConflict: 'user_id' }
-            );
+            .upsert([{ user_id: userId, notes }], { onConflict: 'user_id' });
+
+        // Log the result and error to see what's actually happening
+        console.log("Upsert result:", notesResult);
+        console.log("Upsert error:", notesError);
 
         if (notesError) {
             return res.status(400).send(notesError.message);
