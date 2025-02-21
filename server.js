@@ -20,79 +20,68 @@ app.use(express.json());
 
 // Create a new user
 app.post('/register', async (req, res) => {
-    const { email, username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!email || !username || !password) {
-        return res.status(400).send("Email, username, and password are required.");
+    if (!email || !password) {
+        return res.status(400).send("Email and password are required.");
     }
 
+    // Sign up the user using Supabase auth
     const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
-        data : {
-            username: username,
-        }
     });
 
     if (error) {
         return res.status(400).send(error.message);
     }
 
-    await supabase.from('profiles').insert([{ user_id: data.user.id, username, email }]);
+    // Insert the user profile using the email as identifier
+    const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([{ user_id: data.user.id, email }]);
 
+    if (profileError) {
+        return res.status(400).send(profileError.message);
+    }
 
     res.send("User registered successfully!");
 });
 
-
 // Login a user
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
-        return res.status(400).send("Username and password are required.");
+    if (!email || !password) {
+        return res.status(400).send("Email and password are required.");
     }
 
-    // First, fetch the email corresponding to the display name (username)
-    const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('username', username)
-        .single();
-
-    if (profileError || !profile) {
-        return res.status(404).send("User not found.");
-    }
-
-    const email = profile.email;
-
-    // Now sign in using the retrieved email and the provided password
+    // Sign in using email and password
     const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
     });
 
     if (error) {
-        return res.status(401).send("Invalid username or password.");
+        return res.status(401).send("Invalid email or password.");
     }
 
     res.send("Login successful!");
 });
 
-
 // Save Notes for the logged-in user
 app.post('/saveNotes', async (req, res) => {
-    const { username, notes } = req.body;
+    const { email, notes } = req.body;
 
-    if (!username || !notes) {
-        return res.status(400).send("Username and notes are required.");
+    if (!email || !notes) {
+        return res.status(400).send("Email and notes are required.");
     }
 
-    // Fetch user ID from the username
+    // Fetch user ID from the profiles table using email
     const { data: userData, error } = await supabase
         .from('profiles')
         .select('user_id')
-        .eq('username', username)
+        .eq('email', email)
         .single();
 
     if (error || !userData) {
@@ -101,27 +90,31 @@ app.post('/saveNotes', async (req, res) => {
 
     const userId = userData.user_id;
 
-    // Save notes for the user in a 'notes' table
-    await supabase
+    // Save notes for the user in the 'notes' table
+    const { error: notesError } = await supabase
         .from('notes')
         .upsert([{ user_id: userId, notes }]);
+
+    if (notesError) {
+        return res.status(400).send(notesError.message);
+    }
 
     res.send("Notes saved successfully!");
 });
 
 // Load Notes for a user
 app.post('/loadNotes', async (req, res) => {
-    const { username } = req.body;
+    const { email } = req.body;
 
-    if (!username) {
-        return res.status(400).send("Username is required.");
+    if (!email) {
+        return res.status(400).send("Email is required.");
     }
 
-    // Fetch user ID from the username
+    // Fetch user ID from the profiles table using email
     const { data: userData, error } = await supabase
         .from('profiles')
         .select('user_id')
-        .eq('username', username)
+        .eq('email', email)
         .single();
 
     if (error || !userData) {

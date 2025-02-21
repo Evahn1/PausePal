@@ -207,14 +207,7 @@ emailInput.style.padding = "10px";
 emailInput.style.border = "1px solid #ccc";
 emailInput.style.borderRadius = "5px";
 
-// Username Input for Registration
-const regUsernameInput = document.createElement("input");
-regUsernameInput.type = "text";
-regUsernameInput.placeholder = "Enter username";
-regUsernameInput.style.fontSize = "16px";
-regUsernameInput.style.padding = "10px";
-regUsernameInput.style.border = "1px solid #ccc";
-regUsernameInput.style.borderRadius = "5px";
+// Removed the username input from registration
 
 // Password Input for Registration
 const regPasswordInput = document.createElement("input");
@@ -249,7 +242,6 @@ backToLoginButton.style.cursor = "pointer";
 
 // Append registration elements to registration container
 registerContainer.appendChild(emailInput);
-registerContainer.appendChild(regUsernameInput);
 registerContainer.appendChild(regPasswordInput);
 registerContainer.appendChild(registerBtn);
 registerContainer.appendChild(backToLoginButton);
@@ -298,15 +290,14 @@ goToRegisterButton.addEventListener("click", () => {
 });
 
 // ----- Registration Event -----
+// Now only email and password are required for registration
 registerBtn.addEventListener("click", () => {
     const email = emailInput.value;
-    const username = regUsernameInput.value;
     const password = regPasswordInput.value;
 
     // Optional: Validate fields here
 
-    register(username, password, email);
-
+    register(email, password);
 });
 
 // ----- Back to Login from Registration Screen -----
@@ -328,7 +319,6 @@ function logout() {
     usernameInput.value = "";
     passwordInput.value = "";
     emailInput.value = "";
-    regUsernameInput.value = "";
     regPasswordInput.value = "";
     document.body.appendChild(loginContainer);
     // Optionally, clear currentUser
@@ -336,14 +326,14 @@ function logout() {
 }
 
 // ----- Registration Function -----
-function register(username, password, email) {
-    // Send both username and email to the backend for registration
+// Updated to send only email and password
+function register(email, password) {
     fetch('https://pausepal.onrender.com/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ email, password })
     })
         .then(response => response.text())
         .then(data => alert(data))
