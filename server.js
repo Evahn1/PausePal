@@ -71,70 +71,92 @@ app.post('/login', async (req, res) => {
 
 // Save Notes for the logged-in user
 app.post('/saveNotes', async (req, res) => {
-    const { email, notes } = req.body;
+    try {
+        const { email, notes } = req.body;
 
-    if (!email || !notes) {
-        return res.status(400).send("Email and notes are required.");
+        if (!email || !notes) {
+            return res.status(400).send("Email and notes are required.");
+        }
+
+        // 1. Fetch user_id from the profiles table using email
+        const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('user_id')
+            .eq('email', email)
+            .single();
+
+        if (userError || !userData) {
+            return res.status(404).send("User not found.");
+        }
+
+        const userId = userData.user_id;
+
+        // 2. Upsert notes for the user in the 'notes' table
+        //    This will insert a new row if none exists for that user_id,
+        //    or update if there's already one.
+        const { data: notesResult, error: notesError } = await supabase
+            .from('notes')
+            .upsert(
+                [
+                    {
+                        user_id: userId,
+                        notes: notes,
+                    }
+                ],
+                // If you have a unique constraint on user_id in the notes table,
+                // Supabase will handle conflicts automatically. If not, specify:
+                // { onConflict: 'user_id' }
+            );
+
+        if (notesError) {
+            return res.status(400).send(notesError.message);
+        }
+
+        return res.send("Notes saved successfully!");
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send("Server error while saving notes.");
     }
-
-    // Fetch user ID from the profiles table using email
-    const { data: userData, error } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('email', email)
-        .single();
-
-    if (error || !userData) {
-        return res.status(404).send("User not found.");
-    }
-
-    const userId = userData.user_id;
-
-    // Save notes for the user in the 'notes' table
-    const { error: notesError } = await supabase
-        .from('notes')
-        .upsert([{ user_id: userId, notes }]);
-
-    if (notesError) {
-        return res.status(400).send(notesError.message);
-    }
-
-    res.send("Notes saved successfully!");
 });
 
 // Load Notes for a user
 app.post('/loadNotes', async (req, res) => {
-    const { email } = req.body;
+    try {
+        const { email } = req.body;
 
-    if (!email) {
-        return res.status(400).send("Email is required.");
+        if (!email) {
+            return res.status(400).send("Email is required.");
+        }
+
+        // 1. Fetch user_id from the profiles table using email
+        const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('user_id')
+            .eq('email', email)
+            .single();
+
+        if (userError || !userData) {
+            return res.status(404).send("User not found.");
+        }
+
+        const userId = userData.user_id;
+
+        // 2. Fetch notes for the user from the 'notes' table
+        const { data: notesData, error: notesError } = await supabase
+            .from('notes')
+            .select('notes')
+            .eq('user_id', userId)
+            .single();
+
+        if (notesError || !notesData) {
+            return res.status(404).send("No notes found for this user.");
+        }
+
+        return res.send(notesData.notes);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send("Server error while loading notes.");
     }
-
-    // Fetch user ID from the profiles table using email
-    const { data: userData, error } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('email', email)
-        .single();
-
-    if (error || !userData) {
-        return res.status(404).send("User not found.");
-    }
-
-    const userId = userData.user_id;
-
-    // Fetch notes for the user from the 'notes' table
-    const { data: notesData, error: notesError } = await supabase
-        .from('notes')
-        .select('notes')
-        .eq('user_id', userId)
-        .single();
-
-    if (notesError || !notesData) {
-        return res.status(404).send("No notes found for this user.");
-    }
-
-    res.send(notesData.notes);
 });
 
 // Simple test endpoint
