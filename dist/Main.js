@@ -8,6 +8,9 @@ let currentUser = null;
 // ==========================
 
 // ----- Login Container -----
+
+notepadArea.style.color = "#333";  // Sets the text color to dark gray (readable)
+notepadArea.style.backgroundColor = "#fff";  // Ensures a white background
 const loginContainer = document.createElement("div");
 loginContainer.id = "loginContainer";
 loginContainer.style.width = "300px";

@@ -210,5 +210,18 @@ button:hover {
         right: 10px;
     }
 
+    #notepadArea {
+        width: 100%;
+        min-height: 400px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        padding: 12px;
+        background-color: #fff; /* White background */
+        color: #333; /* Dark text for visibility */
+        overflow-y: auto;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+    }
+
 
 }
