@@ -4,41 +4,9 @@
 let currentUser = null;
 
 // ============
-// Task Manager / Notepad Screen
+// Task Manager / Notepad Screen Elements
 // ============
 const notepadContainer = document.createElement("div");
-
-// Label for the notepad (optional)
-const label = document.createElement("label");
-label.htmlFor = "notepad";
-
-// Create the text area
-const textArea = document.createElement("textarea");
-textArea.id = "notepad";
-textArea.placeholder = "Start Typing Here...";
-textArea.style.width = "600px"; // Slightly wider for better usability
-textArea.style.height = "400px"; // Balanced height
-textArea.style.fontFamily = "Arial, sans-serif";
-textArea.style.fontSize = "16px";
-textArea.style.padding = "12px";
-textArea.style.border = "2px solid #ccc"; // Subtle border
-textArea.style.borderRadius = "8px"; // Rounded corners
-textArea.style.boxShadow = "3px 3px 10px rgba(0, 0, 0, 0.1)"; // Soft shadow
-textArea.style.resize = "none"; // Prevents manual resizing
-textArea.style.outline = "none"; // Removes default focus outline
-textArea.style.backgroundColor = "#f9f9f9"; // Light background for readability
-textArea.style.color = "#333"; // Dark text for contrast
-
-// Add focus effect
-textArea.addEventListener("focus", () => {
-    textArea.style.border = "2px solid #007bff"; // Highlight when active
-});
-textArea.addEventListener("blur", () => {
-    textArea.style.border = "2px solid #ccc"; // Revert when not active
-});
-
-// Load saved notes from localStorage (if desired)
-textArea.value = localStorage.getItem("savedNotes") || "";
 
 // Log Out Button
 const logOutButton = document.createElement("button");
@@ -47,64 +15,65 @@ logOutButton.innerText = "Logout";
 logOutButton.style.position = "absolute";
 logOutButton.style.top = "10px";
 logOutButton.style.left = "10px";
-logOutButton.style.width = "100px"; // Match Save button's width
-logOutButton.style.height = "40px"; // Match Save button's height
+logOutButton.style.width = "100px";
+logOutButton.style.height = "40px";
 logOutButton.style.fontSize = "16px";
 logOutButton.style.border = "none";
-logOutButton.style.borderRadius = "5px"; // Rounded edges
-logOutButton.style.backgroundColor = "#dc3545"; // Red color for logout
-logOutButton.style.color = "white"; // White text
+logOutButton.style.borderRadius = "5px";
+logOutButton.style.backgroundColor = "#dc3545";
+logOutButton.style.color = "white";
 logOutButton.style.cursor = "pointer";
-logOutButton.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)"; // Subtle shadow
-logOutButton.style.transition = "0.3s"; // Smooth transition effect
+logOutButton.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)";
+logOutButton.style.transition = "0.3s";
+logOutButton.addEventListener("mouseover", () => { logOutButton.style.opacity = "0.8"; });
+logOutButton.addEventListener("mouseout", () => { logOutButton.style.opacity = "1"; });
+logOutButton.addEventListener("click", () => { logout(); });
 
-// Hover effect for Logout button
-logOutButton.addEventListener("mouseover", () => {
-    logOutButton.style.opacity = "0.8";
-});
-logOutButton.addEventListener("mouseout", () => {
-    logOutButton.style.opacity = "1";
-});
+// Create the text area for notes
+const textArea = document.createElement("textarea");
+textArea.id = "notepad";
+textArea.placeholder = "Start Typing Here...";
+textArea.style.width = "600px";
+textArea.style.height = "400px";
+textArea.style.fontFamily = "Arial, sans-serif";
+textArea.style.fontSize = "16px";
+textArea.style.padding = "12px";
+textArea.style.border = "2px solid #ccc";
+textArea.style.borderRadius = "8px";
+textArea.style.boxShadow = "3px 3px 10px rgba(0, 0, 0, 0.1)";
+textArea.style.resize = "none";
+textArea.style.outline = "none";
+textArea.style.backgroundColor = "#f9f9f9";
+textArea.style.color = "#333";
+textArea.addEventListener("focus", () => { textArea.style.border = "2px solid #007bff"; });
+textArea.addEventListener("blur", () => { textArea.style.border = "2px solid #ccc"; });
+textArea.value = localStorage.getItem("savedNotes") || "";
 
-// Click event to log out
-logOutButton.addEventListener("click", () => {
-    logout(); // Call the logout function
-});
-
-// Save Button
+// Save Button for notes
 const saveButton = document.createElement("button");
 saveButton.innerText = "Save";
 saveButton.style.marginTop = "10px";
 saveButton.style.position = "absolute";
 saveButton.style.right = "25px";
 saveButton.style.top = "10px";
-saveButton.style.width = "100px"; // Set a uniform width
-saveButton.style.height = "40px"; // Set a uniform height
+saveButton.style.width = "100px";
+saveButton.style.height = "40px";
 saveButton.style.fontSize = "16px";
 saveButton.style.border = "none";
 saveButton.style.borderRadius = "5px";
-saveButton.style.backgroundColor = "#007bff"; // Nice blue color
+saveButton.style.backgroundColor = "#007bff";
 saveButton.style.color = "white";
 saveButton.style.cursor = "pointer";
 saveButton.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)";
 saveButton.style.transition = "0.3s";
-
-// Hover effect for Save button
-saveButton.addEventListener("mouseover", () => {
-    saveButton.style.opacity = "0.8";
-});
-saveButton.addEventListener("mouseout", () => {
-    saveButton.style.opacity = "1";
-});
-
-// Save notes on click
+saveButton.addEventListener("mouseover", () => { saveButton.style.opacity = "0.8"; });
+saveButton.addEventListener("mouseout", () => { saveButton.style.opacity = "1"; });
 saveButton.addEventListener("click", () => {
     const notes = textArea.value;
-
     fetch('https://pausepal.onrender.com/saveNotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: currentUser, notes }) // Send email + notes
+        body: JSON.stringify({ email: currentUser, notes })
     })
         .then(response => response.text())
         .then(data => alert(data))
@@ -114,18 +83,97 @@ saveButton.addEventListener("click", () => {
         });
 });
 
-// Append elements to the notepad container
+// Append notepad elements to container
 notepadContainer.append(logOutButton);
 notepadContainer.appendChild(textArea);
-notepadContainer.appendChild(label);
 notepadContainer.appendChild(saveButton);
 
 // ============
-// Login Screen Container
+// Task Manager Section
+// ============
+const taskManagerContainer = document.createElement("div");
+taskManagerContainer.style.marginTop = "20px";
+
+// Input for new tasks
+const taskInput = document.createElement("input");
+taskInput.type = "text";
+taskInput.placeholder = "Enter new task";
+taskInput.style.fontSize = "16px";
+taskInput.style.padding = "10px";
+taskInput.style.marginRight = "10px";
+taskInput.style.width = "300px";
+
+// Button to add a new task
+const addTaskButton = document.createElement("button");
+addTaskButton.innerText = "Add Task";
+addTaskButton.style.padding = "10px";
+addTaskButton.style.fontSize = "16px";
+addTaskButton.style.border = "none";
+addTaskButton.style.borderRadius = "5px";
+addTaskButton.style.backgroundColor = "#28a745";
+addTaskButton.style.color = "white";
+addTaskButton.style.cursor = "pointer";
+
+// Container for the list of tasks
+const tasksList = document.createElement("ul");
+tasksList.style.listStyleType = "none";
+tasksList.style.padding = "0";
+tasksList.style.marginTop = "20px";
+
+// Function to add a new task
+function addTask(taskText) {
+    const li = document.createElement("li");
+    li.style.display = "flex";
+    li.style.alignItems = "center";
+    li.style.padding = "5px 0";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.style.marginRight = "10px";
+
+    const span = document.createElement("span");
+    span.innerText = taskText;
+    span.style.flexGrow = "1";
+
+    li.appendChild(checkbox);
+    li.appendChild(span);
+    tasksList.appendChild(li);
+
+    checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+            span.style.textDecoration = "line-through";
+            // Move the completed task to the bottom
+            tasksList.appendChild(li);
+        } else {
+            span.style.textDecoration = "none";
+            // Optionally, reposition if desired
+        }
+    });
+}
+
+// Event listener for adding tasks
+addTaskButton.addEventListener("click", () => {
+    const taskText = taskInput.value.trim();
+    if (taskText !== "") {
+        addTask(taskText);
+        taskInput.value = "";
+    }
+});
+
+// Append task manager elements to its container
+taskManagerContainer.appendChild(taskInput);
+taskManagerContainer.appendChild(addTaskButton);
+taskManagerContainer.appendChild(tasksList);
+
+// Append the task manager container to the notepad container
+notepadContainer.appendChild(taskManagerContainer);
+
+// ============
+// Login Screen Elements
 // ============
 const loginContainer = document.createElement("div");
 loginContainer.style.width = "300px";
-loginContainer.style.margin = "100px auto"; // Center the container
+loginContainer.style.margin = "100px auto";
 loginContainer.style.padding = "20px";
 loginContainer.style.border = "1px solid #ccc";
 loginContainer.style.borderRadius = "10px";
@@ -142,7 +190,6 @@ loginEmailInput.style.fontSize = "16px";
 loginEmailInput.style.padding = "10px";
 loginEmailInput.style.border = "1px solid #ccc";
 loginEmailInput.style.borderRadius = "5px";
-loginEmailInput.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 
 // Password Input for Login
 const passwordInput = document.createElement("input");
@@ -152,7 +199,6 @@ passwordInput.style.fontSize = "16px";
 passwordInput.style.padding = "10px";
 passwordInput.style.border = "1px solid #ccc";
 passwordInput.style.borderRadius = "5px";
-passwordInput.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 
 // Login Button
 const loginBtn = document.createElement("button");
@@ -183,7 +229,7 @@ loginContainer.appendChild(loginBtn);
 loginContainer.appendChild(goToRegisterButton);
 
 // ============
-// Registration Screen Container
+// Registration Screen Elements
 // ============
 const registerContainer = document.createElement("div");
 registerContainer.style.width = "300px";
@@ -195,7 +241,6 @@ registerContainer.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 registerContainer.style.display = "flex";
 registerContainer.style.flexDirection = "column";
 registerContainer.style.gap = "10px";
-// Hide registration screen by default
 registerContainer.style.display = "none";
 
 // Email Input for Registration
@@ -271,7 +316,7 @@ loginBtn.addEventListener("click", async () => {
         })
             .then(response => response.text())
             .then(notes => {
-                textArea.value = notes; // Set notes in the text area
+                textArea.value = notes;
                 loadTaskManager();
             })
             .catch(err => {
@@ -291,9 +336,6 @@ goToRegisterButton.addEventListener("click", () => {
 registerBtn.addEventListener("click", () => {
     const email = emailInput.value;
     const password = regPasswordInput.value;
-
-    // Optional: Validate fields here
-
     register(email, password);
 });
 
@@ -303,7 +345,7 @@ backToLoginButton.addEventListener("click", () => {
     loginContainer.style.display = "flex";
 });
 
-// ----- Load Task Manager Screen -----
+// ----- Load Task Manager / Notepad Screen -----
 function loadTaskManager() {
     document.body.innerHTML = ""; // Clear the body
     document.body.appendChild(notepadContainer);
@@ -312,13 +354,12 @@ function loadTaskManager() {
 // ----- Logout Function -----
 function logout() {
     document.body.innerHTML = "";
-    // Reset fields if needed
+    // Reset input fields if needed
     loginEmailInput.value = "";
     passwordInput.value = "";
     emailInput.value = "";
     regPasswordInput.value = "";
     document.body.appendChild(loginContainer);
-    // Optionally, clear currentUser
     currentUser = null;
 }
 
@@ -349,7 +390,6 @@ function login(email, password) {
         .then(response => response.text())
         .then(data => {
             if (data === "Login successful!") {
-                // Clear input fields
                 loginEmailInput.value = "";
                 passwordInput.value = "";
                 return true;
