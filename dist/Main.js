@@ -4,41 +4,9 @@
 let currentUser = null;
 
 // ============
-// Task Manager / Notepad Screen
+// Notepad / Task Editor Screen Elements
 // ============
 const notepadContainer = document.createElement("div");
-
-// Label for the notepad (optional)
-const label = document.createElement("label");
-label.htmlFor = "notepad";
-
-// Create the text area
-const textArea = document.createElement("textarea");
-textArea.id = "notepad";
-textArea.placeholder = "Start Typing Here...";
-textArea.style.width = "600px"; // Slightly wider for better usability
-textArea.style.height = "400px"; // Balanced height
-textArea.style.fontFamily = "Arial, sans-serif";
-textArea.style.fontSize = "16px";
-textArea.style.padding = "12px";
-textArea.style.border = "2px solid #ccc"; // Subtle border
-textArea.style.borderRadius = "8px"; // Rounded corners
-textArea.style.boxShadow = "3px 3px 10px rgba(0, 0, 0, 0.1)"; // Soft shadow
-textArea.style.resize = "none"; // Prevents manual resizing
-textArea.style.outline = "none"; // Removes default focus outline
-textArea.style.backgroundColor = "#f9f9f9"; // Light background for readability
-textArea.style.color = "#333"; // Dark text for contrast
-
-// Add focus effect
-textArea.addEventListener("focus", () => {
-    textArea.style.border = "2px solid #007bff"; // Highlight when active
-});
-textArea.addEventListener("blur", () => {
-    textArea.style.border = "2px solid #ccc"; // Revert when not active
-});
-
-// Load saved notes from localStorage (if desired)
-textArea.value = localStorage.getItem("savedNotes") || "";
 
 // Log Out Button
 const logOutButton = document.createElement("button");
@@ -47,64 +15,66 @@ logOutButton.innerText = "Logout";
 logOutButton.style.position = "absolute";
 logOutButton.style.top = "10px";
 logOutButton.style.left = "10px";
-logOutButton.style.width = "100px"; // Match Save button's width
-logOutButton.style.height = "40px"; // Match Save button's height
+logOutButton.style.width = "100px";
+logOutButton.style.height = "40px";
 logOutButton.style.fontSize = "16px";
 logOutButton.style.border = "none";
-logOutButton.style.borderRadius = "5px"; // Rounded edges
-logOutButton.style.backgroundColor = "#dc3545"; // Red color for logout
-logOutButton.style.color = "white"; // White text
+logOutButton.style.borderRadius = "5px";
+logOutButton.style.backgroundColor = "#dc3545";
+logOutButton.style.color = "white";
 logOutButton.style.cursor = "pointer";
-logOutButton.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)"; // Subtle shadow
-logOutButton.style.transition = "0.3s"; // Smooth transition effect
+logOutButton.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)";
+logOutButton.style.transition = "0.3s";
+logOutButton.addEventListener("mouseover", () => { logOutButton.style.opacity = "0.8"; });
+logOutButton.addEventListener("mouseout", () => { logOutButton.style.opacity = "1"; });
+logOutButton.addEventListener("click", () => { logout(); });
 
-// Hover effect for Logout button
-logOutButton.addEventListener("mouseover", () => {
-    logOutButton.style.opacity = "0.8";
-});
-logOutButton.addEventListener("mouseout", () => {
-    logOutButton.style.opacity = "1";
-});
+// Create the contenteditable div (instead of a textarea)
+const notepadArea = document.createElement("div");
+notepadArea.id = "notepadArea";
+notepadArea.contentEditable = "true";
+notepadArea.style.width = "600px";
+notepadArea.style.minHeight = "400px";
+notepadArea.style.fontFamily = "Arial, sans-serif";
+notepadArea.style.fontSize = "16px";
+notepadArea.style.padding = "12px";
+notepadArea.style.border = "2px solid #ccc";
+notepadArea.style.borderRadius = "8px";
+notepadArea.style.boxShadow = "3px 3px 10px rgba(0, 0, 0, 0.1)";
+notepadArea.style.outline = "none";
+notepadArea.style.backgroundColor = "#f9f9f9";
+notepadArea.style.color = "#333";
+notepadArea.innerHTML = localStorage.getItem("savedNotes") || "";
 
-// Click event to log out
-logOutButton.addEventListener("click", () => {
-    logout(); // Call the logout function
-});
+// When focused, change border color
+notepadArea.addEventListener("focus", () => { notepadArea.style.border = "2px solid #007bff"; });
+notepadArea.addEventListener("blur", () => { notepadArea.style.border = "2px solid #ccc"; });
 
-// Save Button
+// Save Button for notes
 const saveButton = document.createElement("button");
 saveButton.innerText = "Save";
 saveButton.style.marginTop = "10px";
 saveButton.style.position = "absolute";
 saveButton.style.right = "25px";
 saveButton.style.top = "10px";
-saveButton.style.width = "100px"; // Set a uniform width
-saveButton.style.height = "40px"; // Set a uniform height
+saveButton.style.width = "100px";
+saveButton.style.height = "40px";
 saveButton.style.fontSize = "16px";
 saveButton.style.border = "none";
 saveButton.style.borderRadius = "5px";
-saveButton.style.backgroundColor = "#007bff"; // Nice blue color
+saveButton.style.backgroundColor = "#007bff";
 saveButton.style.color = "white";
 saveButton.style.cursor = "pointer";
 saveButton.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)";
 saveButton.style.transition = "0.3s";
-
-// Hover effect for Save button
-saveButton.addEventListener("mouseover", () => {
-    saveButton.style.opacity = "0.8";
-});
-saveButton.addEventListener("mouseout", () => {
-    saveButton.style.opacity = "1";
-});
-
-// Save notes on click
+saveButton.addEventListener("mouseover", () => { saveButton.style.opacity = "0.8"; });
+saveButton.addEventListener("mouseout", () => { saveButton.style.opacity = "1"; });
 saveButton.addEventListener("click", () => {
-    const notes = textArea.value;
-
+    const notesContent = notepadArea.innerHTML;
     fetch('https://pausepal.onrender.com/saveNotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: currentUser, notes }) // Send email + notes
+        body: JSON.stringify({ email: currentUser, notes: notesContent })
     })
         .then(response => response.text())
         .then(data => alert(data))
@@ -114,18 +84,84 @@ saveButton.addEventListener("click", () => {
         });
 });
 
+// -----------------
+// Task Insertion Toolbar
+// -----------------
+const toolbar = document.createElement("div");
+toolbar.style.marginTop = "10px";
+
+// Button to insert a new task into the contenteditable area
+const addTaskButton = document.createElement("button");
+addTaskButton.innerText = "Insert Task";
+addTaskButton.style.padding = "8px 12px";
+addTaskButton.style.fontSize = "14px";
+addTaskButton.style.border = "none";
+addTaskButton.style.borderRadius = "5px";
+addTaskButton.style.backgroundColor = "#28a745";
+addTaskButton.style.color = "white";
+addTaskButton.style.cursor = "pointer";
+
+// When clicked, this function inserts a task element at the current caret position.
+addTaskButton.addEventListener("click", () => {
+    insertTask();
+});
+
+// Function to create and insert a task element
+function insertTask() {
+    // Create a container for the task (you can adjust the tag as needed, e.g., <div> or <p>)
+    const taskContainer = document.createElement("div");
+    taskContainer.style.display = "flex";
+    taskContainer.style.alignItems = "center";
+    taskContainer.style.margin = "5px 0";
+
+    // Create the checkbox
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.style.marginRight = "8px";
+
+    // Create the text span that is editable within the task container
+    const taskText = document.createElement("span");
+    taskText.contentEditable = "true";
+    taskText.style.flexGrow = "1";
+    taskText.style.outline = "none";
+    taskText.innerText = "New Task";
+
+    // Listen for checkbox changes to apply a strikethrough style
+    checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+            taskText.style.textDecoration = "line-through";
+            // Optionally, you could also move the task element to the bottom.
+            // For instance, remove and reinsert the taskContainer at the end of the notepadArea:
+            notepadArea.appendChild(taskContainer);
+        } else {
+            taskText.style.textDecoration = "none";
+        }
+    });
+
+    // Append the checkbox and text to the container
+    taskContainer.appendChild(checkbox);
+    taskContainer.appendChild(taskText);
+
+    // Insert the new task container at the current caret position in the contenteditable area.
+    // For simplicity, here we append it to the end.
+    notepadArea.appendChild(taskContainer);
+}
+
+// Append toolbar button to toolbar
+toolbar.appendChild(addTaskButton);
+
 // Append elements to the notepad container
-notepadContainer.append(logOutButton);
-notepadContainer.appendChild(textArea);
-notepadContainer.appendChild(label);
+notepadContainer.appendChild(logOutButton);
+notepadContainer.appendChild(notepadArea);
+notepadContainer.appendChild(toolbar);
 notepadContainer.appendChild(saveButton);
 
 // ============
-// Login Screen Container
+// Login Screen Elements
 // ============
 const loginContainer = document.createElement("div");
 loginContainer.style.width = "300px";
-loginContainer.style.margin = "100px auto"; // Center the container
+loginContainer.style.margin = "100px auto";
 loginContainer.style.padding = "20px";
 loginContainer.style.border = "1px solid #ccc";
 loginContainer.style.borderRadius = "10px";
@@ -142,7 +178,6 @@ loginEmailInput.style.fontSize = "16px";
 loginEmailInput.style.padding = "10px";
 loginEmailInput.style.border = "1px solid #ccc";
 loginEmailInput.style.borderRadius = "5px";
-loginEmailInput.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 
 // Password Input for Login
 const passwordInput = document.createElement("input");
@@ -152,7 +187,6 @@ passwordInput.style.fontSize = "16px";
 passwordInput.style.padding = "10px";
 passwordInput.style.border = "1px solid #ccc";
 passwordInput.style.borderRadius = "5px";
-passwordInput.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 
 // Login Button
 const loginBtn = document.createElement("button");
@@ -183,7 +217,7 @@ loginContainer.appendChild(loginBtn);
 loginContainer.appendChild(goToRegisterButton);
 
 // ============
-// Registration Screen Container
+// Registration Screen Elements
 // ============
 const registerContainer = document.createElement("div");
 registerContainer.style.width = "300px";
@@ -195,7 +229,6 @@ registerContainer.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 registerContainer.style.display = "flex";
 registerContainer.style.flexDirection = "column";
 registerContainer.style.gap = "10px";
-// Hide registration screen by default
 registerContainer.style.display = "none";
 
 // Email Input for Registration
@@ -271,12 +304,12 @@ loginBtn.addEventListener("click", async () => {
         })
             .then(response => response.text())
             .then(notes => {
-                textArea.value = notes; // Set notes in the text area
-                loadTaskManager();
+                notepadArea.innerHTML = notes;
+                loadTaskEditor();
             })
             .catch(err => {
                 console.error("Failed to load notes:", err);
-                loadTaskManager();
+                loadTaskEditor();
             });
     }
 });
@@ -291,9 +324,6 @@ goToRegisterButton.addEventListener("click", () => {
 registerBtn.addEventListener("click", () => {
     const email = emailInput.value;
     const password = regPasswordInput.value;
-
-    // Optional: Validate fields here
-
     register(email, password);
 });
 
@@ -303,8 +333,8 @@ backToLoginButton.addEventListener("click", () => {
     loginContainer.style.display = "flex";
 });
 
-// ----- Load Task Manager Screen -----
-function loadTaskManager() {
+// ----- Load Task Editor / Notepad Screen -----
+function loadTaskEditor() {
     document.body.innerHTML = ""; // Clear the body
     document.body.appendChild(notepadContainer);
 }
@@ -312,13 +342,12 @@ function loadTaskManager() {
 // ----- Logout Function -----
 function logout() {
     document.body.innerHTML = "";
-    // Reset fields if needed
+    // Reset input fields if needed
     loginEmailInput.value = "";
     passwordInput.value = "";
     emailInput.value = "";
     regPasswordInput.value = "";
     document.body.appendChild(loginContainer);
-    // Optionally, clear currentUser
     currentUser = null;
 }
 
@@ -349,7 +378,6 @@ function login(email, password) {
         .then(response => response.text())
         .then(data => {
             if (data === "Login successful!") {
-                // Clear input fields
                 loginEmailInput.value = "";
                 passwordInput.value = "";
                 return true;
