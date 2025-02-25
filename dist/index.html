@@ -1,11 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Task Manager</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- The .app-container comes from your current CSS -->
+<div class="app-container" id="notepadContainer">
+    <!-- Logout and Save buttons positioned per your design -->
+    <button id="logoutButton">Logout</button>
+    <button id="saveButton">Save</button>
+
+    <!-- This is our notepad area where tasks (lines) will be added -->
+    <div id="notepadArea" contenteditable="false">
+        <!-- Existing tasks/notes will be loaded here -->
+    </div>
+
+    <!-- Toolbar with the Insert Task button -->
+    <div id="toolbar">
+        <button id="insertTaskButton">Insert Task</button>
+    </div>
+</div>
+
 <script src="Main.js"></script>
 </body>
 </html>
