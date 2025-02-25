@@ -4,8 +4,10 @@
 let currentUser = null;
 
 // ============
-// Notepad / Task Editor Screen Elements
+// Notepad / Rich Task Editor Screen Elements
 // ============
+
+// Create a container for the notepad and its toolbar
 const notepadContainer = document.createElement("div");
 
 // Log Out Button
@@ -29,7 +31,7 @@ logOutButton.addEventListener("mouseover", () => { logOutButton.style.opacity = 
 logOutButton.addEventListener("mouseout", () => { logOutButton.style.opacity = "1"; });
 logOutButton.addEventListener("click", () => { logout(); });
 
-// Create the contenteditable div (instead of a textarea)
+// Create the contenteditable notepad area (replacing your textarea)
 const notepadArea = document.createElement("div");
 notepadArea.id = "notepadArea";
 notepadArea.contentEditable = "true";
@@ -44,9 +46,9 @@ notepadArea.style.boxShadow = "3px 3px 10px rgba(0, 0, 0, 0.1)";
 notepadArea.style.outline = "none";
 notepadArea.style.backgroundColor = "#f9f9f9";
 notepadArea.style.color = "#333";
+// Load saved notes (if any)
 notepadArea.innerHTML = localStorage.getItem("savedNotes") || "";
 
-// When focused, change border color
 notepadArea.addEventListener("focus", () => { notepadArea.style.border = "2px solid #007bff"; });
 notepadArea.addEventListener("blur", () => { notepadArea.style.border = "2px solid #ccc"; });
 
@@ -85,12 +87,12 @@ saveButton.addEventListener("click", () => {
 });
 
 // -----------------
-// Task Insertion Toolbar
+// Toolbar for Inserting Tasks
 // -----------------
 const toolbar = document.createElement("div");
 toolbar.style.marginTop = "10px";
 
-// Button to insert a new task into the contenteditable area
+// Button to insert a new task at the caret in the notepad area
 const addTaskButton = document.createElement("button");
 addTaskButton.innerText = "Insert Task";
 addTaskButton.style.padding = "8px 12px";
@@ -101,56 +103,29 @@ addTaskButton.style.backgroundColor = "#28a745";
 addTaskButton.style.color = "white";
 addTaskButton.style.cursor = "pointer";
 
-// When clicked, this function inserts a task element at the current caret position.
+// When clicked, insert a task element at the caret position
 addTaskButton.addEventListener("click", () => {
-    insertTask();
+    insertTaskAtCaret();
 });
 
-// Function to create and insert a task element
-function insertTask() {
-    // Create a container for the task (you can adjust the tag as needed, e.g., <div> or <p>)
-    const taskContainer = document.createElement("div");
-    taskContainer.style.display = "flex";
-    taskContainer.style.alignItems = "center";
-    taskContainer.style.margin = "5px 0";
-
-    // Create the checkbox
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.style.marginRight = "8px";
-
-    // Create the text span that is editable within the task container
-    const taskText = document.createElement("span");
-    taskText.contentEditable = "true";
-    taskText.style.flexGrow = "1";
-    taskText.style.outline = "none";
-    taskText.innerText = "New Task";
-
-    // Listen for checkbox changes to apply a strikethrough style
-    checkbox.addEventListener("change", () => {
-        if (checkbox.checked) {
-            taskText.style.textDecoration = "line-through";
-            // Optionally, you could also move the task element to the bottom.
-            // For instance, remove and reinsert the taskContainer at the end of the notepadArea:
-            notepadArea.appendChild(taskContainer);
-        } else {
-            taskText.style.textDecoration = "none";
-        }
-    });
-
-    // Append the checkbox and text to the container
-    taskContainer.appendChild(checkbox);
-    taskContainer.appendChild(taskText);
-
-    // Insert the new task container at the current caret position in the contenteditable area.
-    // For simplicity, here we append it to the end.
-    notepadArea.appendChild(taskContainer);
+// Inserts HTML for a task element at the current caret position
+function insertTaskAtCaret() {
+    // The inserted HTML consists of a task container with a checkbox and editable text.
+    // The checkbox uses an inline onchange handler to toggle strikethrough style.
+    const taskHTML = `<div style="display:flex; align-items:center; margin:5px 0;">
+        <input type="checkbox" onchange="(function(el){ 
+            var span = el.nextElementSibling; 
+            span.style.textDecoration = el.checked ? 'line-through' : 'none'; 
+        })(this)">
+        <span contenteditable="true" style="flex-grow:1; outline:none;">New Task</span>
+    </div>`;
+    document.execCommand('insertHTML', false, taskHTML);
 }
 
-// Append toolbar button to toolbar
+// Append the toolbar button to the toolbar
 toolbar.appendChild(addTaskButton);
 
-// Append elements to the notepad container
+// Append elements to the notepad container (everything is together)
 notepadContainer.appendChild(logOutButton);
 notepadContainer.appendChild(notepadArea);
 notepadContainer.appendChild(toolbar);
@@ -291,11 +266,9 @@ document.body.appendChild(registerContainer);
 loginBtn.addEventListener("click", async () => {
     const email = loginEmailInput.value;
     const password = passwordInput.value;
-
     const isLoggedIn = await login(email, password);
     if (isLoggedIn) {
         currentUser = email; // Store email globally
-
         // Load user's saved notes from backend
         fetch('https://pausepal.onrender.com/loadNotes', {
             method: 'POST',
