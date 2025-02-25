@@ -8,9 +8,6 @@ let currentUser = null;
 // ==========================
 
 // ----- Login Container -----
-
-notepadArea.style.color = "#333";  // Sets the text color to dark gray (readable)
-notepadArea.style.backgroundColor = "#fff";  // Ensures a white background
 const loginContainer = document.createElement("div");
 loginContainer.id = "loginContainer";
 loginContainer.style.width = "300px";
@@ -65,6 +62,7 @@ notepadContainer.style.display = "none";
 notepadContainer.style.flexDirection = "column";
 notepadContainer.style.alignItems = "center";
 
+
 // ----- Toolbar (Logout & Save Buttons) -----
 const toolbar = document.createElement("div");
 toolbar.style.display = "flex";
@@ -112,6 +110,9 @@ notepadArea.style.borderRadius = "8px";
 notepadArea.style.padding = "12px";
 notepadArea.style.backgroundColor = "#f9f9f9";
 notepadArea.style.overflowY = "auto";
+notepadArea.style.color = "#333"; // Ensures text is visible
+notepadArea.style.backgroundColor = "#fff"; // Ensures a white background
+
 
 // Handle Enter Key for Task Creation
 taskInput.addEventListener("keydown", (e) => {
