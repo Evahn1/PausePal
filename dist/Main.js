@@ -53,15 +53,13 @@ loginContainer.appendChild(goToRegisterBtn);
 // ----- Notepad / Task Editor Container -----
 const notepadContainer = document.createElement("div");
 notepadContainer.id = "notepadContainer";
-notepadContainer.style.width = "90%";
-notepadContainer.style.maxWidth = "600px";
+notepadContainer.style.width = "50%";
 notepadContainer.style.minHeight = "80vh";
 notepadContainer.style.borderRadius = "8px";
 notepadContainer.style.padding = "20px";
 notepadContainer.style.display = "none";
 notepadContainer.style.flexDirection = "column";
-notepadContainer.style.alignItems = "center";
-
+notepadContainer.style.alignItems = "flex-start"; // Align left
 
 // ----- Toolbar (Logout & Save Buttons) -----
 const toolbar = document.createElement("div");
@@ -108,11 +106,9 @@ notepadArea.style.minHeight = "400px";
 notepadArea.style.border = "2px solid #ccc";
 notepadArea.style.borderRadius = "8px";
 notepadArea.style.padding = "12px";
-notepadArea.style.backgroundColor = "#f9f9f9";
-notepadArea.style.overflowY = "auto";
+notepadArea.style.backgroundColor = "#fff";
 notepadArea.style.color = "#333"; // Ensures text is visible
-notepadArea.style.backgroundColor = "#fff"; // Ensures a white background
-
+notepadArea.style.overflowY = "auto";
 
 // Handle Enter Key for Task Creation
 taskInput.addEventListener("keydown", (e) => {
@@ -143,14 +139,12 @@ function insertTask(taskText) {
     taskSpan.textContent = taskText;
     taskSpan.contentEditable = "true";
     taskSpan.style.flexGrow = "1";
-    taskSpan.style.borderBottom = "1px solid transparent";
     taskSpan.style.padding = "5px";
 
-    // **Detect if task is empty and remove on Backspace**
     taskSpan.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" && taskSpan.innerText.trim() === "") {
-            e.preventDefault(); // Prevents extra Backspace behavior
-            taskLine.remove(); // Deletes the entire task row
+            e.preventDefault();
+            taskLine.remove();
         }
     });
 
@@ -159,66 +153,74 @@ function insertTask(taskText) {
     notepadArea.appendChild(taskLine);
 }
 
-
 // Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
 notepadContainer.appendChild(taskInput);
 notepadContainer.appendChild(notepadArea);
 
-// ----- Append Containers to Body -----
-document.body.appendChild(loginContainer);
-document.body.appendChild(notepadContainer);
+// ==========================
+// AI Integration
+// ==========================
+const aiContainer = document.createElement("div");
+aiContainer.style.width = "45%";
+aiContainer.style.minHeight = "400px";
+aiContainer.style.border = "2px solid #ccc";
+aiContainer.style.borderRadius = "8px";
+aiContainer.style.padding = "12px";
+aiContainer.style.backgroundColor = "#f9f9f9";
+aiContainer.style.color = "#333";
+aiContainer.style.overflowY = "auto";
+aiContainer.style.fontFamily = "Arial, sans-serif";
+aiContainer.innerText = "AI will generate insights here...";
 
-// ==========================
-// Event Listeners for Login
-// ==========================
-loginBtn.addEventListener("click", async () => {
-    const email = loginEmailInput.value;
-    const password = loginPasswordInput.value;
-    const isLoggedIn = await login(email, password);
-    if (isLoggedIn) {
-        currentUser = email;
-        loadTaskEditor();
+// AI Button
+const aiButton = document.createElement("button");
+aiButton.innerText = "Ask AI for Help";
+aiButton.style.padding = "10px";
+aiButton.style.fontSize = "16px";
+aiButton.style.borderRadius = "5px";
+aiButton.style.backgroundColor = "#ff9800";
+aiButton.style.color = "white";
+aiButton.addEventListener("click", fetchAIResponse);
+
+// Append AI elements
+const mainContainer = document.createElement("div");
+mainContainer.style.display = "flex";
+mainContainer.style.justifyContent = "space-between";
+mainContainer.style.width = "100%";
+mainContainer.appendChild(notepadContainer);
+mainContainer.appendChild(aiContainer);
+document.body.appendChild(mainContainer);
+document.body.appendChild(aiButton);
+
+// AI Fetch Function
+async function fetchAIResponse() {
+    aiContainer.innerText = "Thinking...";
+
+    let tasks = [...notepadArea.querySelectorAll(".task-text")]
+        .map(task => task.innerText.trim())
+        .filter(task => task !== "")
+        .join("\n");
+
+    if (!tasks) {
+        aiContainer.innerText = "No tasks found. Add some first!";
+        return;
     }
-});
 
-logOutButton.addEventListener("click", logout);
+    try {
+        const response = await fetch("http://localhost:11434/api/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: "mistral",
+                prompt: `Here are my tasks:\n\n${tasks}\n\nGive me insights.`,
+                stream: false
+            })
+        });
 
-// ==========================
-// View Loading Functions
-// ==========================
-function loadTaskEditor() {
-    loginContainer.style.display = "none";
-    notepadContainer.style.display = "flex";
-    taskInput.focus();
-}
-
-function logout() {
-    notepadArea.innerHTML = "";
-    loginEmailInput.value = "";
-    loginPasswordInput.value = "";
-    currentUser = null;
-    notepadContainer.style.display = "none";
-    loginContainer.style.display = "flex";
-}
-
-// ==========================
-// Server Interaction Functions
-// ==========================
-function login(email, password) {
-    return fetch('https://pausepal.onrender.com/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-    })
-        .then(response => response.text())
-        .then(data => {
-            if (data === "Login successful!") {
-                return true;
-            } else {
-                alert(data);
-                return false;
-            }
-        })
-        .catch(() => false);
+        const data = await response.json();
+        aiContainer.innerText = data.response || "AI did not return a response.";
+    } catch (error) {
+        aiContainer.innerText = "Error connecting to AI.";
+    }
 }
