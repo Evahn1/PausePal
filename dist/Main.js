@@ -170,14 +170,12 @@ aiContainer.style.padding = "12px";
 aiContainer.style.backgroundColor = "#f9f9f9";
 aiContainer.style.color = "#333";
 aiContainer.style.overflowY = "auto";
-aiContainer.style.fontFamily = "Arial, sans-serif";
 aiContainer.innerText = "AI will generate insights here...";
 
 // AI Button
 const aiButton = document.createElement("button");
 aiButton.innerText = "Ask AI for Help";
 aiButton.style.padding = "10px";
-aiButton.style.fontSize = "16px";
 aiButton.style.borderRadius = "5px";
 aiButton.style.backgroundColor = "#ff9800";
 aiButton.style.color = "white";
@@ -211,11 +209,7 @@ async function fetchAIResponse() {
         const response = await fetch("http://localhost:11434/api/generate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                model: "mistral",
-                prompt: `Here are my tasks:\n\n${tasks}\n\nGive me insights.`,
-                stream: false
-            })
+            body: JSON.stringify({ model: "mistral", prompt: `Here are my tasks:\n\n${tasks}\n\nGive me insights.`, stream: false })
         });
 
         const data = await response.json();
