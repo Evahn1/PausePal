@@ -146,10 +146,19 @@ function insertTask(taskText) {
     taskSpan.style.borderBottom = "1px solid transparent";
     taskSpan.style.padding = "5px";
 
+    // **Detect if task is empty and remove on Backspace**
+    taskSpan.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && taskSpan.innerText.trim() === "") {
+            e.preventDefault(); // Prevents extra Backspace behavior
+            taskLine.remove(); // Deletes the entire task row
+        }
+    });
+
     taskLine.appendChild(checkbox);
     taskLine.appendChild(taskSpan);
     notepadArea.appendChild(taskLine);
 }
+
 
 // Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
