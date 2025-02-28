@@ -50,6 +50,50 @@ loginContainer.appendChild(loginPasswordInput);
 loginContainer.appendChild(loginBtn);
 loginContainer.appendChild(goToRegisterBtn);
 
+// ----- Registration Container -----
+const registerContainer = document.createElement("div");
+registerContainer.id = "registerContainer";
+registerContainer.style.width = "300px";
+registerContainer.style.margin = "100px auto";
+registerContainer.style.padding = "20px";
+registerContainer.style.border = "1px solid #ccc";
+registerContainer.style.borderRadius = "10px";
+registerContainer.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+registerContainer.style.display = "none";
+registerContainer.style.flexDirection = "column";
+registerContainer.style.gap = "10px";
+
+// Registration Inputs
+const registerEmailInput = document.createElement("input");
+registerEmailInput.type = "email";
+registerEmailInput.placeholder = "Enter email";
+registerEmailInput.style.padding = "10px";
+
+const registerPasswordInput = document.createElement("input");
+registerPasswordInput.type = "password";
+registerPasswordInput.placeholder = "Enter password";
+registerPasswordInput.style.padding = "10px";
+
+// Register Button (Fixed!)
+const registerBtn = document.createElement("button");
+registerBtn.innerText = "Register";
+registerBtn.style.padding = "10px";
+registerBtn.style.backgroundColor = "#28a745";
+registerBtn.style.color = "white";
+
+// Back to Login Button
+const backToLoginBtn = document.createElement("button");
+backToLoginBtn.innerText = "Back to Login";
+backToLoginBtn.style.padding = "10px";
+backToLoginBtn.style.backgroundColor = "#6c757d";
+backToLoginBtn.style.color = "white";
+
+// Append to Register Container
+registerContainer.appendChild(registerEmailInput);
+registerContainer.appendChild(registerPasswordInput);
+registerContainer.appendChild(registerBtn);
+registerContainer.appendChild(backToLoginBtn);
+
 // ----- Notepad / Task Editor Container -----
 const notepadContainer = document.createElement("div");
 notepadContainer.id = "notepadContainer";
@@ -77,7 +121,7 @@ logOutButton.style.color = "white";
 logOutButton.style.borderRadius = "5px";
 logOutButton.addEventListener("click", logout);
 
-// Save Button (Fixed!)
+// Save Button
 const saveButton = document.createElement("button");
 saveButton.innerText = "Save";
 saveButton.style.padding = "10px";
@@ -90,107 +134,54 @@ saveButton.addEventListener("click", saveNotes);
 toolbar.appendChild(logOutButton);
 toolbar.appendChild(saveButton);
 
-// ----- Task Input Field -----
-const taskInput = document.createElement("input");
-taskInput.type = "text";
-taskInput.placeholder = "Enter a new task and press Enter";
-taskInput.style.width = "100%";
-taskInput.style.padding = "10px";
-taskInput.style.marginBottom = "10px";
-taskInput.style.border = "1px solid #ccc";
-taskInput.style.borderRadius = "5px";
-
-// ----- Notepad Area -----
-const notepadArea = document.createElement("div");
-notepadArea.id = "notepadArea";
-notepadArea.style.width = "100%";
-notepadArea.style.minHeight = "400px";
-notepadArea.style.border = "2px solid #ccc";
-notepadArea.style.borderRadius = "8px";
-notepadArea.style.padding = "12px";
-notepadArea.style.backgroundColor = "#fff";
-notepadArea.style.color = "#333"; // Ensures text is visible
-notepadArea.style.overflowY = "auto";
-
-// Handle Enter Key for Task Creation
-taskInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-        e.preventDefault();
-        insertTask(taskInput.value);
-        taskInput.value = "";
-    }
-});
-
-// Insert Task Function
-function insertTask(taskText) {
-    if (!taskText.trim()) return;
-
-    const taskLine = document.createElement("div");
-    taskLine.style.display = "flex";
-    taskLine.style.alignItems = "center";
-    taskLine.style.gap = "10px";
-    taskLine.style.padding = "5px 0";
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-
-    const taskSpan = document.createElement("span");
-    taskSpan.textContent = taskText;
-    taskSpan.contentEditable = "true";
-    taskSpan.style.flexGrow = "1";
-    taskSpan.style.padding = "5px";
-
-    taskSpan.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && taskSpan.innerText.trim() === "") {
-            e.preventDefault();
-            taskLine.remove();
-        }
-    });
-
-    taskLine.appendChild(checkbox);
-    taskLine.appendChild(taskSpan);
-    notepadArea.appendChild(taskLine);
-}
-
 // Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
-notepadContainer.appendChild(taskInput);
-notepadContainer.appendChild(notepadArea);
+
+// ----- Append Containers to Body -----
+document.body.appendChild(loginContainer);
+document.body.appendChild(registerContainer);
+document.body.appendChild(notepadContainer);
 
 // ==========================
-// AI Integration
+// Event Listeners for Login/Register
 // ==========================
-const aiContainer = document.createElement("div");
-aiContainer.style.width = "45%";
-aiContainer.style.minHeight = "400px";
-aiContainer.style.border = "2px solid #ccc";
-aiContainer.style.borderRadius = "8px";
-aiContainer.style.padding = "12px";
-aiContainer.style.backgroundColor = "#f9f9f9";
-aiContainer.style.color = "#333";
-aiContainer.innerText = "AI will generate insights here...";
+loginBtn.addEventListener("click", async () => {
+    currentUser = loginEmailInput.value;
+    loadTaskEditor();
+});
 
-// AI Button
-const aiButton = document.createElement("button");
-aiButton.innerText = "Ask AI for Help";
-aiButton.style.padding = "10px";
-aiButton.style.borderRadius = "5px";
-aiButton.style.backgroundColor = "#ff9800";
-aiButton.style.color = "white";
-aiButton.addEventListener("click", fetchAIResponse);
+goToRegisterBtn.addEventListener("click", () => {
+    loginContainer.style.display = "none";
+    registerContainer.style.display = "flex";
+});
 
-// Append AI elements
-const mainContainer = document.createElement("div");
-mainContainer.style.display = "flex";
-mainContainer.style.justifyContent = "space-between";
-mainContainer.style.width = "100%";
-mainContainer.appendChild(notepadContainer);
-mainContainer.appendChild(aiContainer);
-document.body.appendChild(mainContainer);
-document.body.appendChild(aiButton);
+registerBtn.addEventListener("click", () => {
+    register(registerEmailInput.value, registerPasswordInput.value);
+});
+
+backToLoginBtn.addEventListener("click", () => {
+    registerContainer.style.display = "none";
+    loginContainer.style.display = "flex";
+});
 
 // ==========================
-// Server Interaction Functions
+// View Loading Functions
+// ==========================
+function loadTaskEditor() {
+    loginContainer.style.display = "none";
+    registerContainer.style.display = "none";
+    notepadContainer.style.display = "flex";
+}
+
+function logout() {
+    currentUser = null;
+    loginContainer.style.display = "flex";
+    registerContainer.style.display = "none";
+    notepadContainer.style.display = "none";
+}
+
+// ==========================
+// Register & Save Notes Functions
 // ==========================
 function register(email, password) {
     fetch('https://pausepal.onrender.com/register', {
@@ -201,17 +192,17 @@ function register(email, password) {
         .then(response => response.text())
         .then(data => {
             alert(data);
+            registerContainer.style.display = "none";
             loginContainer.style.display = "flex";
         })
         .catch(() => alert("Registration failed."));
 }
 
 function saveNotes() {
-    const notesContent = notepadArea.innerHTML;
     fetch('https://pausepal.onrender.com/saveNotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: currentUser, notes: notesContent })
+        body: JSON.stringify({ email: currentUser, notes: notepadContainer.innerHTML })
     })
         .then(response => response.text())
         .then(data => alert(data))
