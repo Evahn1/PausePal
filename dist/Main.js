@@ -4,8 +4,10 @@
 let currentUser = null;
 
 // ==========================
-// Create Login Page (Always Visible on Startup)
+// Create Containers
 // ==========================
+
+// ----- Login Container -----
 const loginContainer = document.createElement("div");
 loginContainer.id = "loginContainer";
 loginContainer.style.width = "300px";
@@ -48,54 +50,7 @@ loginContainer.appendChild(loginPasswordInput);
 loginContainer.appendChild(loginBtn);
 loginContainer.appendChild(goToRegisterBtn);
 
-// ==========================
-// Create Register Page (Initially Hidden)
-// ==========================
-const registerContainer = document.createElement("div");
-registerContainer.id = "registerContainer";
-registerContainer.style.width = "300px";
-registerContainer.style.margin = "100px auto";
-registerContainer.style.padding = "20px";
-registerContainer.style.border = "1px solid #ccc";
-registerContainer.style.borderRadius = "10px";
-registerContainer.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
-registerContainer.style.display = "none";
-registerContainer.style.flexDirection = "column";
-registerContainer.style.gap = "10px";
-
-// Register Inputs
-const registerEmailInput = document.createElement("input");
-registerEmailInput.type = "email";
-registerEmailInput.placeholder = "Enter email";
-registerEmailInput.style.padding = "10px";
-
-const registerPasswordInput = document.createElement("input");
-registerPasswordInput.type = "password";
-registerPasswordInput.placeholder = "Enter password";
-registerPasswordInput.style.padding = "10px";
-
-// Register Buttons
-const registerBtn = document.createElement("button");
-registerBtn.innerText = "Register";
-registerBtn.style.padding = "10px";
-registerBtn.style.backgroundColor = "#28a745";
-registerBtn.style.color = "white";
-
-const backToLoginBtn = document.createElement("button");
-backToLoginBtn.innerText = "Back to Sign In";
-backToLoginBtn.style.padding = "10px";
-backToLoginBtn.style.backgroundColor = "#6c757d";
-backToLoginBtn.style.color = "white";
-
-// Append to Register Container
-registerContainer.appendChild(registerEmailInput);
-registerContainer.appendChild(registerPasswordInput);
-registerContainer.appendChild(registerBtn);
-registerContainer.appendChild(backToLoginBtn);
-
-// ==========================
-// Create Task Manager (Initially Hidden)
-// ==========================
+// ----- Notepad / Task Editor Container -----
 const notepadContainer = document.createElement("div");
 notepadContainer.id = "notepadContainer";
 notepadContainer.style.width = "90%";
@@ -107,10 +62,13 @@ notepadContainer.style.display = "none";
 notepadContainer.style.flexDirection = "column";
 notepadContainer.style.alignItems = "center";
 
-// Toolbar (Logout & Save)
+
+// ----- Toolbar (Logout & Save Buttons) -----
 const toolbar = document.createElement("div");
 toolbar.style.display = "flex";
 toolbar.style.justifyContent = "space-between";
+toolbar.style.width = "100%";
+toolbar.style.paddingBottom = "10px";
 
 // Logout Button
 const logOutButton = document.createElement("button");
@@ -119,64 +77,100 @@ logOutButton.style.padding = "10px";
 logOutButton.style.backgroundColor = "#dc3545";
 logOutButton.style.color = "white";
 logOutButton.style.borderRadius = "5px";
-logOutButton.addEventListener("click", logout);
 
-// Save Button (Fixed!)
+// Save Button
 const saveButton = document.createElement("button");
 saveButton.innerText = "Save";
 saveButton.style.padding = "10px";
 saveButton.style.backgroundColor = "#007bff";
 saveButton.style.color = "white";
 saveButton.style.borderRadius = "5px";
-saveButton.addEventListener("click", () => {
-    const notesContent = notepadArea.innerHTML;
-    fetch('https://pausepal.onrender.com/saveNotes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: currentUser, notes: notesContent })
-    })
-        .then(response => response.text())
-        .then(data => alert(data))
-        .catch(err => {
-            console.error("Failed to save notes:", err);
-            alert("Failed to save notes.");
-        });
-});
 
 // Append to Toolbar
 toolbar.appendChild(logOutButton);
 toolbar.appendChild(saveButton);
 
-// Task Input
+// ----- Task Input Field -----
 const taskInput = document.createElement("input");
 taskInput.type = "text";
 taskInput.placeholder = "Enter a new task and press Enter";
 taskInput.style.width = "100%";
 taskInput.style.padding = "10px";
+taskInput.style.marginBottom = "10px";
 taskInput.style.border = "1px solid #ccc";
 taskInput.style.borderRadius = "5px";
 
-// Task Area
+// ----- Notepad Area -----
 const notepadArea = document.createElement("div");
+notepadArea.id = "notepadArea";
 notepadArea.style.width = "100%";
-notepadArea.style.minHeight = "300px";
-notepadArea.style.border = "1px solid #ccc";
-notepadArea.style.borderRadius = "5px";
-notepadArea.style.padding = "10px";
-notepadArea.style.backgroundColor = "#fff";
+notepadArea.style.minHeight = "400px";
+notepadArea.style.border = "2px solid #ccc";
+notepadArea.style.borderRadius = "8px";
+notepadArea.style.padding = "12px";
+notepadArea.style.backgroundColor = "#f9f9f9";
+notepadArea.style.overflowY = "auto";
+notepadArea.style.color = "#333"; // Ensures text is visible
+notepadArea.style.backgroundColor = "#fff"; // Ensures a white background
 
-// Append Elements
+
+// Handle Enter Key for Task Creation
+taskInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        insertTask(taskInput.value);
+        taskInput.value = "";
+    }
+});
+
+// Insert Task Function
+function insertTask(taskText) {
+    if (!taskText.trim()) return;
+
+    const taskLine = document.createElement("div");
+    taskLine.style.display = "flex";
+    taskLine.style.alignItems = "center";
+    taskLine.style.gap = "10px";
+    taskLine.style.padding = "5px 0";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.addEventListener("change", () => {
+        taskSpan.style.textDecoration = checkbox.checked ? "line-through" : "none";
+    });
+
+    const taskSpan = document.createElement("span");
+    taskSpan.textContent = taskText;
+    taskSpan.contentEditable = "true";
+    taskSpan.style.flexGrow = "1";
+    taskSpan.style.borderBottom = "1px solid transparent";
+    taskSpan.style.padding = "5px";
+
+    // **Detect if task is empty and remove on Backspace**
+    taskSpan.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && taskSpan.innerText.trim() === "") {
+            e.preventDefault(); // Prevents extra Backspace behavior
+            taskLine.remove(); // Deletes the entire task row
+        }
+    });
+
+    taskLine.appendChild(checkbox);
+    taskLine.appendChild(taskSpan);
+    notepadArea.appendChild(taskLine);
+}
+
+
+// Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
 notepadContainer.appendChild(taskInput);
 notepadContainer.appendChild(notepadArea);
 
-// Append Everything to Body
+// ----- Append Containers to Body -----
 document.body.appendChild(loginContainer);
-document.body.appendChild(registerContainer);
 document.body.appendChild(notepadContainer);
 
 // ==========================
-// Event Listeners
+// Event Listeners for Login
 // ==========================
 loginBtn.addEventListener("click", async () => {
     const email = loginEmailInput.value;
@@ -188,29 +182,29 @@ loginBtn.addEventListener("click", async () => {
     }
 });
 
-goToRegisterBtn.addEventListener("click", () => {
+logOutButton.addEventListener("click", logout);
+
+// ==========================
+// View Loading Functions
+// ==========================
+function loadTaskEditor() {
     loginContainer.style.display = "none";
-    registerContainer.style.display = "flex";
-});
-
-registerBtn.addEventListener("click", () => {
-    registerContainer.style.display = "none";
-    loginContainer.style.display = "flex";
-});
-
-backToLoginBtn.addEventListener("click", () => {
-    registerContainer.style.display = "none";
-    loginContainer.style.display = "flex";
-});
-
-// Logout Function
-function logout() {
-    currentUser = null;
-    loginContainer.style.display = "flex";
-    notepadContainer.style.display = "none";
+    notepadContainer.style.display = "flex";
+    taskInput.focus();
 }
 
-// Login Function
+function logout() {
+    notepadArea.innerHTML = "";
+    loginEmailInput.value = "";
+    loginPasswordInput.value = "";
+    currentUser = null;
+    notepadContainer.style.display = "none";
+    loginContainer.style.display = "flex";
+}
+
+// ==========================
+// Server Interaction Functions
+// ==========================
 function login(email, password) {
     return fetch('https://pausepal.onrender.com/login', {
         method: 'POST',
@@ -218,12 +212,13 @@ function login(email, password) {
         body: JSON.stringify({ email, password })
     })
         .then(response => response.text())
-        .then(data => data === "Login successful!")
+        .then(data => {
+            if (data === "Login successful!") {
+                return true;
+            } else {
+                alert(data);
+                return false;
+            }
+        })
         .catch(() => false);
-}
-
-// Load Task Editor
-function loadTaskEditor() {
-    loginContainer.style.display = "none";
-    notepadContainer.style.display = "flex";
 }
