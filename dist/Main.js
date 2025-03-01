@@ -62,6 +62,19 @@ notepadContainer.style.display = "none";
 notepadContainer.style.flexDirection = "column";
 notepadContainer.style.alignItems = "center";
 
+const registerContainer = document.createElement("div");
+registerContainer.style.width = "300px";
+registerContainer.style.margin = "100px auto";
+registerContainer.style.padding = "20px";
+registerContainer.style.border = "1px solid #ccc";
+registerContainer.style.borderRadius = "10px";
+registerContainer.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+registerContainer.style.display = "flex";
+registerContainer.style.flexDirection = "column";
+registerContainer.style.gap = "10px";
+registerContainer.style.display = "none";
+
+
 
 // ----- Toolbar (Logout & Save Buttons) -----
 const toolbar = document.createElement("div");
@@ -215,7 +228,9 @@ backToLoginBtn.addEventListener("click", () => {
     loginContainer.style.display = "flex";
 });
 
-logOutButton.addEventListener("click", logout);
+logOutButton.addEventListener("click", () => {
+    logout();
+});
 // =================================
 // Event listeners for Save feature
 // =================================
