@@ -12,7 +12,11 @@ let currentUser = null;
 const loginContainer = document.createElement("div");
 loginContainer.id = "loginContainer";
 loginContainer.style.width = "300px";
-loginContainer.style.margin = "100px auto";
+loginContainer.style.position = "absolute";
+loginContainer.style.top = "50%";
+loginContainer.style.left = "50%";
+loginContainer.style.transform = "translate(-50%, -50%)";
+loginContainer.style.margin = "0"; // Remove margin so centering works correctly
 loginContainer.style.padding = "20px";
 loginContainer.style.border = "1px solid #ccc";
 loginContainer.style.borderRadius = "10px";
@@ -79,6 +83,7 @@ notepadContainer.style.flexDirection = "column";
 notepadContainer.style.alignItems = "center";
 notepadContainer.style.display = "flex";
 notepadContainer.style.flexDirection = "column";
+notepadContainer.style.display = "none";
 
 
 // ----- AI Output Box -----
@@ -345,10 +350,11 @@ saveButton.addEventListener("click", () => {
 // View Loading Functions
 // ==========================
 function loadTaskEditor() {
+    if (!currentUser) return; // Prevent accidental showing
     loginContainer.style.display = "none";
     registerContainer.style.display = "none";
     notepadContainer.style.display = "flex";
-    aiOutputBox.style.display = "block"; // Show AI output box when entering the task manager
+    aiOutputBox.style.display = "block";
     taskInput.focus();
 }
 
