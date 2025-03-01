@@ -190,11 +190,10 @@ app.get("/", (req, res) => {
     res.send("Server is running!");
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// Simple test endpoint (THIS MUST BE THE LAST ROUTE)
+// Simple test endpoint
 app.get("/", (req, res) => {
     res.send("Server is running!");
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
