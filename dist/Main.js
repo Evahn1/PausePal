@@ -47,7 +47,7 @@ goToRegisterBtn.style.color = "white";
 
 // Create the login image
 const loginImage = document.createElement("img");
-loginImage.src = "your-image-url-here"; // Replace with actual URL or file path
+loginImage.src = "dist/Screenshot 2025-03-01 at 1.44.07 PM.png"; // Replace with actual URL or file path
 loginImage.alt = "Login Image";
 loginImage.style.width = "100%"; // Adjust width as needed
 loginImage.style.maxWidth = "150px"; // Controls max size
