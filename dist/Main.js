@@ -95,6 +95,7 @@ aiOutputBox.style.color = "#333";
 aiOutputBox.style.backgroundColor = "#fff";
 aiOutputBox.style.pointerEvents = "none"; // Makes it read-only
 aiOutputBox.innerText = "AI-generated task plan will appear here...";
+aiOutputBox.style.display = "none"; // Hide it initially
 
 
 const registerContainer = document.createElement("div");
@@ -345,7 +346,9 @@ saveButton.addEventListener("click", () => {
 // ==========================
 function loadTaskEditor() {
     loginContainer.style.display = "none";
+    registerContainer.style.display = "none";
     notepadContainer.style.display = "flex";
+    aiOutputBox.style.display = "block"; // Show AI output box when entering the task manager
     taskInput.focus();
 }
 
@@ -355,8 +358,10 @@ function logout() {
     loginPasswordInput.value = "";
     currentUser = null;
     notepadContainer.style.display = "none";
+    aiOutputBox.style.display = "none"; // Hide AI output box when logging out
     loginContainer.style.display = "flex";
 }
+
 
 // ==========================
 // Server Interaction Functions
