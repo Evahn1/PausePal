@@ -147,8 +147,6 @@ app.post('/loadNotes', async (req, res) => {
     }
 });
 
-import fetch from 'node-fetch'; // Ensure this import is at the top of your file
-
 const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY;
 const TOGETHER_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
 
