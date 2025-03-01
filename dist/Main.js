@@ -77,6 +77,25 @@ notepadContainer.style.padding = "20px";
 notepadContainer.style.display = "none";
 notepadContainer.style.flexDirection = "column";
 notepadContainer.style.alignItems = "center";
+notepadContainer.style.display = "flex";
+notepadContainer.style.flexDirection = "column";
+
+
+// ----- AI Output Box -----
+const aiOutputBox = document.createElement("div");
+aiOutputBox.id = "aiOutputBox";
+aiOutputBox.style.width = "40%";
+aiOutputBox.style.minHeight = "400px";
+aiOutputBox.style.border = "2px solid #ccc";
+aiOutputBox.style.borderRadius = "8px";
+aiOutputBox.style.padding = "12px";
+aiOutputBox.style.backgroundColor = "#f9f9f9";
+aiOutputBox.style.overflowY = "auto";
+aiOutputBox.style.color = "#333";
+aiOutputBox.style.backgroundColor = "#fff";
+aiOutputBox.style.pointerEvents = "none"; // Makes it read-only
+aiOutputBox.innerText = "AI-generated task plan will appear here...";
+
 
 const registerContainer = document.createElement("div");
 registerContainer.style.width = "300px";
@@ -123,7 +142,8 @@ toolbar.appendChild(saveButton);
 const taskInput = document.createElement("input");
 taskInput.type = "text";
 taskInput.placeholder = "Enter a new task and press Enter";
-taskInput.style.width = "100%";
+taskInput.style.width = "55%"; // Shrink it slightly
+taskInput.style.marginRight = "10px"; // Add spacing
 taskInput.style.padding = "10px";
 taskInput.style.marginBottom = "10px";
 taskInput.style.border = "1px solid #ccc";
@@ -198,6 +218,7 @@ function insertTask(taskText) {
 notepadContainer.appendChild(toolbar);
 notepadContainer.appendChild(taskInput);
 notepadContainer.appendChild(notepadArea);
+notepadContainer.appendChild(aiOutputBox);
 
 // ----- Append Containers to Body -----
 document.body.appendChild(loginContainer);
