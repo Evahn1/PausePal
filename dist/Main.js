@@ -213,6 +213,26 @@ function insertTask(taskText) {
     notepadArea.appendChild(taskLine);
 }
 
+// Create a wrapper to position the notepad and AI box side by side
+const taskManagerWrapper = document.createElement("div");
+taskManagerWrapper.style.display = "flex";
+taskManagerWrapper.style.width = "90%";
+taskManagerWrapper.style.maxWidth = "900px"; // Adjust as needed
+taskManagerWrapper.style.gap = "20px"; // Adds space between the two sections
+
+// Adjust notepadContainer to take less space
+notepadContainer.style.flex = "2"; // Takes more space
+aiOutputBox.style.flex = "1"; // Takes less space
+
+// Append both elements to the wrapper
+taskManagerWrapper.appendChild(notepadContainer);
+taskManagerWrapper.appendChild(aiOutputBox);
+
+// Add the wrapper to the body instead of notepadContainer alone
+document.body.appendChild(taskManagerWrapper);
+
+
+
 
 // Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
@@ -222,7 +242,6 @@ notepadContainer.appendChild(aiOutputBox);
 
 // ----- Append Containers to Body -----
 document.body.appendChild(loginContainer);
-document.body.appendChild(notepadContainer);
 document.body.appendChild(registerContainer);
 
 // Define the missing register inputs and buttons
