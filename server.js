@@ -2,11 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+import fetch from 'node-fetch'; // Required for making API calls
 
 dotenv.config(); // Load environment variables
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000; // Set port to 10000
 
 // Supabase credentials from environment variables
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -95,10 +96,6 @@ app.post('/saveNotes', async (req, res) => {
             .from('notes')
             .upsert([{ user_id: userId, notes }], { onConflict: 'user_id' });
 
-        // Log the result and error to see what's actually happening
-        console.log("Upsert result:", notesResult);
-        console.log("Upsert error:", notesError);
-
         if (notesError) {
             return res.status(400).send(notesError.message);
         }
@@ -150,7 +147,54 @@ app.post('/loadNotes', async (req, res) => {
     }
 });
 
+import fetch from 'node-fetch'; // Ensure this import is at the top of your file
+
+const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY;
+const TOGETHER_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
+
+// AI Route: Generate a response from Together AI
+app.post('/ai', async (req, res) => {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+        return res.status(400).send("Prompt is required.");
+    }
+
+    try {
+        const response = await fetch("https://api.together.xyz/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${TOGETHER_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: TOGETHER_MODEL,
+                messages: [{ role: "user", content: prompt }],
+                max_tokens: 200
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.choices && data.choices.length > 0) {
+            res.json({ response: data.choices[0].message.content });
+        } else {
+            res.status(500).send("Failed to get a response from Together AI.");
+        }
+    } catch (error) {
+        console.error("AI API error:", error);
+        res.status(500).send("Error processing AI request.");
+    }
+});
+
 // Simple test endpoint
+app.get("/", (req, res) => {
+    res.send("Server is running!");
+});
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Simple test endpoint (THIS MUST BE THE LAST ROUTE)
 app.get("/", (req, res) => {
     res.send("Server is running!");
 });
