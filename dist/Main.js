@@ -6,6 +6,8 @@ let currentUser = null;
 // ==========================
 // Create Containers
 // ==========================
+document.body.appendChild(registerContainer);
+
 
 // ----- Login Container -----
 const loginContainer = document.createElement("div");
