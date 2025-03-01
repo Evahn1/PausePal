@@ -183,12 +183,6 @@ function insertTask(taskText) {
         }
     });
 
-    taskLine.appendChild(checkbox);
-    taskLine.appendChild(taskSpan);
-    notepadArea.appendChild(taskLine);
-}
-
-
 // Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
 notepadContainer.appendChild(taskInput);
