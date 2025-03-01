@@ -152,30 +152,24 @@ taskInput.addEventListener("keydown", (e) => {
     }
 });
 
-// Insert Task Function
 function insertTask(taskText) {
-    if (!taskText.trim()) return;
+    if (!taskText.trim()) return; // Prevent empty tasks
 
+    // Create task container
     const taskLine = document.createElement("div");
     taskLine.style.display = "flex";
     taskLine.style.alignItems = "center";
     taskLine.style.gap = "10px";
     taskLine.style.padding = "5px 0";
 
+    // Create checkbox for task completion
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.addEventListener("change", () => {
         taskSpan.style.textDecoration = checkbox.checked ? "line-through" : "none";
-
-        // Append elements to taskLine
-        taskLine.appendChild(checkbox);
-        taskLine.appendChild(taskSpan);
-
-// Append task to notepad area
-        notepadArea.appendChild(taskLine);
-
     });
 
+    // Create editable task text
     const taskSpan = document.createElement("span");
     taskSpan.textContent = taskText;
     taskSpan.contentEditable = "true";
@@ -183,13 +177,22 @@ function insertTask(taskText) {
     taskSpan.style.borderBottom = "1px solid transparent";
     taskSpan.style.padding = "5px";
 
-    // **Detect if task is empty and remove on Backspace**
+    // Delete task when empty and Backspace is pressed
     taskSpan.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" && taskSpan.innerText.trim() === "") {
-            e.preventDefault(); // Prevents extra Backspace behavior
-            taskLine.remove(); // Deletes the entire task row
+            e.preventDefault();
+            taskLine.remove();
         }
     });
+
+    // Append elements to task container
+    taskLine.appendChild(checkbox);
+    taskLine.appendChild(taskSpan);
+
+    // Append task container to the notepad area
+    notepadArea.appendChild(taskLine);
+}
+
 
 // Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
