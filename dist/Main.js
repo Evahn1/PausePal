@@ -188,6 +188,36 @@ function insertTask(taskText) {
     notepadArea.appendChild(taskLine);
 }
 
+document.getElementById("ai-button").addEventListener("click", async () => {
+    const taskManager = document.getElementById("task-manager-screen");
+
+    if (taskManager.style.display === "none") return; // Ensure it's only usable when visible
+
+    const prompt = document.getElementById("ai-input").value.trim();
+    if (!prompt) return;
+
+    try {
+        const response = await fetch("https://pausepal.onrender.com/ai", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ prompt })
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        const data = await response.json();
+        document.getElementById("ai-output").textContent = data.response || "No response received.";
+    } catch (error) {
+        console.error("AI Request Error:", error);
+        document.getElementById("ai-output").textContent = "Error getting AI response.";
+    }
+});
+
+
 
 // Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
