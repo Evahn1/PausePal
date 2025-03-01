@@ -166,6 +166,14 @@ function insertTask(taskText) {
     checkbox.type = "checkbox";
     checkbox.addEventListener("change", () => {
         taskSpan.style.textDecoration = checkbox.checked ? "line-through" : "none";
+
+        // Append elements to taskLine
+        taskLine.appendChild(checkbox);
+        taskLine.appendChild(taskSpan);
+
+// Append task to notepad area
+        notepadArea.appendChild(taskLine);
+
     });
 
     const taskSpan = document.createElement("span");
