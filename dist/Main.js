@@ -45,6 +45,21 @@ goToRegisterBtn.style.padding = "10px";
 goToRegisterBtn.style.backgroundColor = "#28a745";
 goToRegisterBtn.style.color = "white";
 
+// Create the login image
+const loginImage = document.createElement("img");
+loginImage.src = "your-image-url-here"; // Replace with actual URL or file path
+loginImage.alt = "Login Image";
+loginImage.style.width = "100%"; // Adjust width as needed
+loginImage.style.maxWidth = "150px"; // Controls max size
+loginImage.style.margin = "0 auto 10px"; // Centers and adds spacing
+loginImage.style.display = "block"; // Ensures it centers properly
+loginImage.style.borderRadius = "10px"; // Optional: rounded corners
+
+// Insert the image at the top of loginContainer
+loginContainer.appendChild(loginImage); // This adds the image at the bottom
+loginContainer.insertBefore(loginImage, loginContainer.firstChild); // Moves it to the top
+
+
 // Append to Login Container
 loginContainer.appendChild(loginEmailInput);
 loginContainer.appendChild(loginPasswordInput);
