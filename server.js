@@ -139,6 +139,10 @@ app.post('/loadNotes', async (req, res) => {
             .eq('user_id', userId)
             .single();
 
+        if (notesError || !notesData) {
+            return res.status(404).send("");
+        }
+
         return res.send(notesData.notes);
     } catch (err) {
         console.error(err);
