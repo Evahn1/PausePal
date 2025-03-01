@@ -183,6 +183,23 @@ loginBtn.addEventListener("click", async () => {
 });
 
 logOutButton.addEventListener("click", logout);
+// =================================
+// Event listeners for Save feature
+// =================================
+saveButton.addEventListener("click", () => {
+    const notesContent = notepadArea.innerHTML;
+    fetch('https://pausepal.onrender.com/saveNotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentUser, notes: notesContent })
+    })
+        .then(response => response.text())
+        .then(data => alert(data))
+        .catch(err => {
+            console.error("Failed to save notes:", err);
+            alert("Failed to save notes.");
+        });
+});
 
 // ==========================
 // View Loading Functions

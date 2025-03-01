@@ -1,208 +1,158 @@
-// ============
-// Global Variables
-// ============
-let currentUser = null;
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
 
-// ============
-// References to Login / Registration Elements
-// ============
-const loginContainer = document.getElementById("loginContainer");
-const registerContainer = document.getElementById("registerContainer");
-const notepadContainer = document.getElementById("notepadContainer");
+dotenv.config(); // Load environment variables
 
-const loginEmailInput = document.getElementById("loginEmail");
-const loginPasswordInput = document.getElementById("loginPassword");
-const loginBtn = document.getElementById("loginBtn");
-const goToRegisterBtn = document.getElementById("goToRegisterBtn");
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-const registerEmailInput = document.getElementById("registerEmail");
-const registerPasswordInput = document.getElementById("registerPassword");
-const registerBtn = document.getElementById("registerBtn");
-const backToLoginBtn = document.getElementById("backToLoginBtn");
+// Supabase credentials from environment variables
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
-// ============
-// References to Notepad / Task Editor Elements
-// ============
-const logoutButton = document.getElementById("logoutButton");
-const saveButton = document.getElementById("saveButton");
-const insertTaskButton = document.getElementById("insertTaskButton");
-const notepadArea = document.getElementById("notepadArea");
+// Initialize Supabase client
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ============
-// Event Listeners for Login / Registration
-// ============
-loginBtn.addEventListener("click", async () => {
-    const email = loginEmailInput.value;
-    const password = loginPasswordInput.value;
-    const isLoggedIn = await login(email, password);
-    if (isLoggedIn) {
-        currentUser = email;
-        loadNotes(email);
+app.use(cors());
+app.use(express.json());
+
+// Create a new user
+app.post('/register', async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).send("Email and password are required.");
     }
-});
 
-goToRegisterBtn.addEventListener("click", () => {
-    loginContainer.style.display = "none";
-    registerContainer.style.display = "flex";
-});
-
-registerBtn.addEventListener("click", async () => {
-    const email = registerEmailInput.value;
-    const password = registerPasswordInput.value;
-    const success = await register(email, password);
-    if (success) {
-        registerContainer.style.display = "none";
-        loginContainer.style.display = "flex";
-    }
-});
-
-backToLoginBtn.addEventListener("click", () => {
-    registerContainer.style.display = "none";
-    loginContainer.style.display = "flex";
-});
-
-// ============
-// Event Listeners for Notepad / Task Editor
-// ============
-logoutButton.addEventListener("click", logout);
-
-saveButton.addEventListener("click", () => {
-    const notesContent = notepadArea.innerHTML;
-    saveNotes(currentUser, notesContent);
-});
-
-insertTaskButton.addEventListener("click", insertTask);
-
-// ============
-// Functions for Task Creation
-// ============
-function createTaskLine() {
-    const taskLine = document.createElement("div");
-    taskLine.className = "task-line";
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.addEventListener("change", () => {
-        taskText.style.textDecoration = checkbox.checked ? "line-through" : "none";
+    // Sign up the user using Supabase auth
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password
     });
 
-    const taskText = document.createElement("span");
-    taskText.className = "task-text";
-    taskText.contentEditable = "true";
-    taskText.innerText = "New Task";
+    if (error) {
+        return res.status(400).send(error.message);
+    }
 
-    taskText.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            const newTaskLine = createTaskLine();
-            taskLine.parentNode.insertBefore(newTaskLine, taskLine.nextSibling);
-            newTaskLine.querySelector(".task-text").focus();
-        }
+    // Insert the user profile using the email as identifier
+    const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([{ user_id: data.user.id, email }]);
+
+    if (profileError) {
+        return res.status(400).send(profileError.message);
+    }
+
+    res.send("User registered successfully!");
+});
+
+// Login a user
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).send("Email and password are required.");
+    }
+
+    // Sign in using email and password
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
     });
 
-    taskLine.appendChild(checkbox);
-    taskLine.appendChild(taskText);
-    return taskLine;
-}
-
-function insertTask() {
-    const newTask = createTaskLine();
-    notepadArea.appendChild(newTask);
-}
-
-// ============
-// View Loading Functions
-// ============
-function loadTaskEditor() {
-    loginContainer.style.display = "none";
-    registerContainer.style.display = "none";
-    notepadContainer.style.display = "flex";
-
-    if (!notepadArea.innerHTML.trim()) {
-        insertTask();
+    if (error) {
+        return res.status(401).send("Invalid email or password.");
     }
-}
 
-function logout() {
-    notepadArea.innerHTML = "";
-    loginEmailInput.value = "";
-    loginPasswordInput.value = "";
-    registerEmailInput.value = "";
-    registerPasswordInput.value = "";
-    currentUser = null;
-    notepadContainer.style.display = "none";
-    loginContainer.style.display = "flex";
-}
+    res.send("Login successful!");
+});
 
-// ============
-// Server Interaction Functions
-// ============
-async function register(email, password) {
+// Save Notes for the logged-in user
+app.post('/saveNotes', async (req, res) => {
     try {
-        const response = await fetch('https://pausepal.onrender.com/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const text = await response.text();
-        alert(text);
-        return response.ok;
-    } catch (error) {
-        console.error('Registration failed:', error);
-        alert('Registration failed.');
-        return false;
-    }
-}
-
-async function login(email, password) {
-    try {
-        const response = await fetch('https://pausepal.onrender.com/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const text = await response.text();
-        if (response.ok) {
-            loginEmailInput.value = "";
-            loginPasswordInput.value = "";
-            return true;
+        const { email, notes } = req.body;
+        if (!email || !notes) {
+            return res.status(400).send("Email and notes are required.");
         }
-        alert(text);
-        return false;
-    } catch (error) {
-        console.error("Login failed:", error);
-        alert("Login failed.");
-        return false;
-    }
-}
 
-async function saveNotes(email, notes) {
-    try {
-        const response = await fetch('https://pausepal.onrender.com/saveNotes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, notes })
-        });
-        alert(await response.text());
-    } catch (error) {
-        console.error("Failed to save notes:", error);
-        alert("Failed to save notes.");
-    }
-}
+        // 1. Fetch user_id
+        const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('user_id')
+            .eq('email', email)
+            .single();
 
-async function loadNotes(email) {
-    try {
-        const response = await fetch('https://pausepal.onrender.com/loadNotes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-        });
-        if (response.ok) {
-            notepadArea.innerHTML = await response.text();
+        if (userError || !userData) {
+            return res.status(404).send("User not found.");
         }
-        loadTaskEditor();
-    } catch (error) {
-        console.error("Failed to load notes:", error);
-        loadTaskEditor();
+
+        const userId = userData.user_id;
+
+        // 2. Upsert notes
+        const { data: notesResult, error: notesError } = await supabase
+            .from('notes')
+            .upsert([{ user_id: userId, notes }], { onConflict: 'user_id' });
+
+        // Log the result and error to see what's actually happening
+        console.log("Upsert result:", notesResult);
+        console.log("Upsert error:", notesError);
+
+        if (notesError) {
+            return res.status(400).send(notesError.message);
+        }
+
+        return res.send("Notes saved successfully!");
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send("Server error while saving notes.");
     }
-}
+});
+
+// Load Notes for a user
+app.post('/loadNotes', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).send("Email is required.");
+        }
+
+        // 1. Fetch user_id from the profiles table using email
+        const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('user_id')
+            .eq('email', email)
+            .single();
+
+        if (userError || !userData) {
+            return res.status(404).send("User not found.");
+        }
+
+        const userId = userData.user_id;
+
+        // 2. Fetch notes for the user from the 'notes' table
+        const { data: notesData, error: notesError } = await supabase
+            .from('notes')
+            .select('notes')
+            .eq('user_id', userId)
+            .single();
+
+        if (notesError || !notesData) {
+            return res.status(404).send("No notes found for this user.");
+        }
+
+        return res.send(notesData.notes);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send("Server error while loading notes.");
+    }
+});
+
+// Simple test endpoint
+app.get("/", (req, res) => {
+    res.send("Server is running!");
+});
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
