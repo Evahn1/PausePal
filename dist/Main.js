@@ -178,8 +178,41 @@ loginBtn.addEventListener("click", async () => {
     const isLoggedIn = await login(email, password);
     if (isLoggedIn) {
         currentUser = email;
-        loadTaskEditor();
+        // Load saved notes from server
+        fetch('https://pausepal.onrender.com/loadNotes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        })
+            .then(response => response.text())
+            .then(notes => {
+                notepadArea.innerHTML = notes;
+                loadTaskEditor();
+            })
+            .catch(err => {
+                console.error("Failed to load notes:", err);
+                loadTaskEditor();
+            });
     }
+});
+
+// =====================
+// Registration Features
+//======================
+goToRegisterBtn.addEventListener("click", () => {
+    loginContainer.style.display = "none";
+    registerContainer.style.display = "flex";
+});
+
+registerBtn.addEventListener("click", () => {
+    const email = registerEmailInput.value;
+    const password = registerPasswordInput.value;
+    register(email, password);
+});
+
+backToLoginBtn.addEventListener("click", () => {
+    registerContainer.style.display = "none";
+    loginContainer.style.display = "flex";
 });
 
 logOutButton.addEventListener("click", logout);
