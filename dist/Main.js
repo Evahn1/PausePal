@@ -318,3 +318,19 @@ function login(email, password) {
         })
         .catch(() => false);
 }
+
+function register(email, password) {
+    fetch('https://pausepal.onrender.com/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    })
+        .then(response => response.text())
+        .then(data => alert(data))
+        .catch(error => {
+            console.error('Registration failed:', error);
+            alert('Registration failed. Check console for details.');
+        });
+}
