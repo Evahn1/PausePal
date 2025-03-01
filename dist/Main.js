@@ -6,7 +6,6 @@ let currentUser = null;
 // ==========================
 // Create Containers
 // ==========================
-document.body.appendChild(registerContainer);
 
 
 // ----- Login Container -----
@@ -183,6 +182,7 @@ notepadContainer.appendChild(notepadArea);
 // ----- Append Containers to Body -----
 document.body.appendChild(loginContainer);
 document.body.appendChild(notepadContainer);
+document.body.appendChild(registerContainer);
 
 // ==========================
 // Event Listeners for Login
