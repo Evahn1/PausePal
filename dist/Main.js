@@ -184,6 +184,10 @@ document.body.appendChild(loginContainer);
 document.body.appendChild(notepadContainer);
 document.body.appendChild(registerContainer);
 
+registerContainer.appendChild(emailInput);
+registerContainer.appendChild(regPasswordInput);
+registerContainer.appendChild(registerBtn);
+registerContainer.appendChild(backToLoginButton);
 // ==========================
 // Event Listeners for Login
 // ==========================
