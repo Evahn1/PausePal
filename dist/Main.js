@@ -75,6 +75,36 @@ registerContainer.style.flexDirection = "column";
 registerContainer.style.gap = "10px";
 registerContainer.style.display = "none";
 
+// Registration Inputs
+const registerEmailInput = document.createElement("input");
+registerEmailInput.type = "email";
+registerEmailInput.placeholder = "Enter email";
+registerEmailInput.style.padding = "10px";
+
+const registerPasswordInput = document.createElement("input");
+registerPasswordInput.type = "password";
+registerPasswordInput.placeholder = "Enter password";
+registerPasswordInput.style.padding = "10px";
+
+// Register Button
+const registerBtn = document.createElement("button");
+registerBtn.innerText = "Register";
+registerBtn.style.padding = "10px";
+registerBtn.style.backgroundColor = "#28a745";
+registerBtn.style.color = "white";
+
+// Back to Login Button
+const backToLoginButton = document.createElement("button");
+backToLoginButton.innerText = "Back to Login";
+backToLoginButton.style.padding = "10px";
+backToLoginButton.style.backgroundColor = "#6c757d";
+backToLoginButton.style.color = "white";
+
+// Append to Register Container
+registerContainer.appendChild(registerEmailInput);
+registerContainer.appendChild(registerPasswordInput);
+registerContainer.appendChild(registerBtn);
+registerContainer.appendChild(backToLoginButton);
 
 
 // ----- Toolbar (Logout & Save Buttons) -----
