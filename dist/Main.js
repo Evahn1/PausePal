@@ -229,6 +229,8 @@ generateBreaksBtn.style.color = "white";
 generateBreaksBtn.style.borderRadius = "5px";
 generateBreaksBtn.style.marginBottom = "10px";
 generateBreaksBtn.style.display = "none";
+generateBreaksBtn.style.width = "100%";
+
 
 
 // Attach an event listener to call your break generation function
