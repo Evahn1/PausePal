@@ -30,11 +30,18 @@ const loginEmailInput = document.createElement("input");
 loginEmailInput.type = "email";
 loginEmailInput.placeholder = "Enter email";
 loginEmailInput.style.padding = "10px";
+loginEmailInput.style.position = "relative";
+loginEmailInput.style.zIndex = "10";
+loginEmailInput.style.backgroundColor = "#fff"; // Ensures a solid white background
+
 
 const loginPasswordInput = document.createElement("input");
 loginPasswordInput.type = "password";
 loginPasswordInput.placeholder = "Enter password";
 loginPasswordInput.style.padding = "10px";
+loginPasswordInput.style.position = "relative";
+loginPasswordInput.style.zIndex = "10";
+loginPasswordInput.style.backgroundColor = "#fff"; // Ensures a solid white background
 
 // Login Buttons
 const loginBtn = document.createElement("button");
