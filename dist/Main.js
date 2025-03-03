@@ -235,7 +235,6 @@ function insertTask(taskText) {
     notepadArea.appendChild(taskLine);
 }
 
-
 // ----- Create Generate Breaks Button -----
 const generateBreaksBtn = document.createElement("button");
 generateBreaksBtn.innerText = "Generate Breaks";
