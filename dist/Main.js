@@ -7,11 +7,6 @@ let currentUser = null;
 // Create Containers
 // ==========================
 
-
-const BREAK_FREQUENCY = "every 60 minutes";
-const BREAK_DURATION = "5 minutes";
-
-
 // ----- Login Container -----
 const loginContainer = document.createElement("div");
 loginContainer.id = "loginContainer";

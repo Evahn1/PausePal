@@ -19,6 +19,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // Initialize Google Gemini AI
 const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 app.use(cors());
 app.use(express.json());
@@ -151,7 +152,6 @@ app.post('/loadNotes', async (req, res) => {
     }
 });
 
-// NEW AI Route: Process tasks using Google Gemini AI
 app.post('/process-tasks', async (req, res) => {
     console.log("AI request received...");
 
@@ -162,21 +162,27 @@ app.post('/process-tasks', async (req, res) => {
     }
 
     try {
-        // Define your fixed parameters
-        const fixedBreakFrequency = "every 60 minutes";
-        const fixedBreakDuration = "5 minutes";
+        // Build a prompt that instructs the AI to generate a human-friendly schedule.
+        const prompt = `
+You are a schedule management assistant. Your job is to take a list of tasks and create a detailed daily schedule that includes work sessions and breaks. For every 45 minutes of work, include a 5-minute break. 
 
-        // Build a prompt that includes the tasks and the fixed parameters
-        const prompt = `Analyze the following tasks and suggest a break schedule.
-Use a break frequency of ${fixedBreakFrequency} and a break duration of ${fixedBreakDuration}.
-Tasks:
-${tasks.join('\n')}`;
+**Formatting Instructions:**
+- Do not output raw JSON.
+- Format the schedule as plain text using clear headings, bullet points, or numbered lists.
+- For each task, display the task name in bold followed by its schedule with start and end times and a description of the activity.
+- Use markdown-style formatting to enhance readability.
+
+Here are the tasks for today:
+${tasks.map((task, index) => `${index + 1}. ${task}`).join('\n')}
+
+Please generate a schedule that meets the above requirements.
+        `;
 
         // Generate text using Google Gemini
         const response = await model.generateText({ prompt, max_tokens: 200 });
 
         if (response && response.candidates && response.candidates.length > 0) {
-            // Send back the AI-generated suggestions
+            // Send back the AI-generated suggestions in a readable text format
             res.json({ suggestions: response.candidates[0].output });
         } else {
             console.error("Error: Gemini AI returned no candidates");
@@ -187,6 +193,7 @@ ${tasks.join('\n')}`;
         res.status(500).send("Error processing tasks with Gemini AI.");
     }
 });
+
 
 // Simple test endpoint
 app.get("/", (req, res) => {
