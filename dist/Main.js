@@ -219,23 +219,55 @@ function insertTask(taskText) {
     notepadArea.appendChild(taskLine);
 }
 
-// Create a wrapper to position the notepad and AI box side by side
+
+// ----- Create Generate Breaks Button -----
+const generateBreaksBtn = document.createElement("button");
+generateBreaksBtn.innerText = "Generate Breaks";
+generateBreaksBtn.style.padding = "10px";
+generateBreaksBtn.style.backgroundColor = "#007bff";
+generateBreaksBtn.style.color = "white";
+generateBreaksBtn.style.borderRadius = "5px";
+generateBreaksBtn.style.marginBottom = "10px";
+
+// Attach an event listener to call your break generation function
+generateBreaksBtn.addEventListener("click", () => {
+    generateBreaks();
+});
+
+function generateBreaks() {
+    // Your logic for generating breaks goes here.
+    aiOutputBox.innerText = "Breaks generated: [insert break plan here]";
+}
+
+// ----- Create AI Output Container -----
+const aiOutputContainer = document.createElement("div");
+aiOutputContainer.style.width = "40%";
+aiOutputContainer.style.display = "flex";
+aiOutputContainer.style.flexDirection = "column";
+aiOutputContainer.style.alignItems = "center";
+
+// Append the button and output box to the AI container
+aiOutputContainer.appendChild(generateBreaksBtn);
+aiOutputContainer.appendChild(aiOutputBox);
+
+// ----- Create Task Manager Wrapper -----
 const taskManagerWrapper = document.createElement("div");
 taskManagerWrapper.style.display = "flex";
 taskManagerWrapper.style.width = "90%";
 taskManagerWrapper.style.maxWidth = "900px"; // Adjust as needed
-taskManagerWrapper.style.gap = "20px"; // Adds space between the two sections
+taskManagerWrapper.style.gap = "20px"; // Space between the two sections
 
-// Adjust notepadContainer to take less space
+// Set flex properties to determine space allocation
 notepadContainer.style.flex = "2"; // Takes more space
-aiOutputBox.style.flex = "1"; // Takes less space
+aiOutputContainer.style.flex = "1"; // Takes less space
 
-// Append both elements to the wrapper
+// Append both containers as siblings to the wrapper
 taskManagerWrapper.appendChild(notepadContainer);
-taskManagerWrapper.appendChild(aiOutputBox);
+taskManagerWrapper.appendChild(aiOutputContainer);
 
-// Add the wrapper to the body instead of notepadContainer alone
+// Append the task manager wrapper to the body
 document.body.appendChild(taskManagerWrapper);
+
 
 
 
@@ -244,7 +276,6 @@ document.body.appendChild(taskManagerWrapper);
 notepadContainer.appendChild(toolbar);
 notepadContainer.appendChild(taskInput);
 notepadContainer.appendChild(notepadArea);
-notepadContainer.appendChild(aiOutputBox);
 
 // ----- Append Containers to Body -----
 document.body.appendChild(loginContainer);
