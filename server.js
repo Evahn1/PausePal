@@ -171,7 +171,7 @@ For every **45 minutes of work, insert a 5-minute break**.
 - **Each task must include:**  
   - Start and end times.  
   - A brief description.  
-- **Breaks must be clearly marked** (e.g., `🚀 Break Time!`).  
+- **Breaks must be clearly marked** (e.g., Break Time).  
 - **Divide the day into sections** (Morning, Afternoon, Evening).  
 
 ---
