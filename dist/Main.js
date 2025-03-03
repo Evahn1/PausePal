@@ -276,7 +276,9 @@ function generateBreaks() {
         })
         .catch(err => {
             console.error("Error generating breaks:", err);
-            aiOutputBox.innerText = "Error generating break plan. Please try again.";
+
+            // Display the actual error message in the UI
+            aiOutputBox.innerText = `Error: ${err.message || "An unknown error occurred"}`;
         });
 }
 
