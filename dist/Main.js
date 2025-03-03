@@ -3,6 +3,7 @@
 // ==========================
 let currentUser = null;
 
+import { marked } from 'marked';
 // ==========================
 // Create Containers
 // ==========================
@@ -98,8 +99,9 @@ aiOutputBox.style.overflowY = "auto";
 aiOutputBox.style.color = "#333";
 aiOutputBox.style.backgroundColor = "#fff";
 aiOutputBox.style.pointerEvents = "none"; // Makes it read-only
-aiOutputBox.innerText = "AI-generated task plan will appear here...";
+aiOutputBox.textContent = "AI-generated task plan will appear here...";
 aiOutputBox.style.display = "none"; // Hide it initially
+
 
 
 const registerContainer = document.createElement("div");
@@ -271,9 +273,11 @@ function generateBreaks() {
     })
         .then(response => response.json())
         .then(data => {
-            // Update the AI output box with the suggestions from Gemini AI
-            aiOutputBox.innerText = data.suggestions;
+            // Convert the markdown to HTML using marked
+            const htmlContent = marked(data.suggestions);
+            aiOutputBox.innerHTML = htmlContent;
         })
+
         .catch(err => {
             console.error("Error generating breaks:", err);
 
