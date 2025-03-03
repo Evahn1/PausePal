@@ -63,6 +63,7 @@ loginImage.style.borderRadius = "10px"; // Optional: rounded corners
 loginContainer.appendChild(loginImage); // This adds the image at the bottom
 loginContainer.insertBefore(loginImage, loginContainer.firstChild); // Moves it to the top
 
+
 // Append to Login Container
 loginContainer.appendChild(loginEmailInput);
 loginContainer.appendChild(loginPasswordInput);
@@ -84,6 +85,7 @@ notepadContainer.style.display = "flex";
 notepadContainer.style.flexDirection = "column";
 notepadContainer.style.display = "none";
 
+
 // ----- AI Output Box -----
 const aiOutputBox = document.createElement("div");
 aiOutputBox.id = "aiOutputBox";
@@ -100,6 +102,7 @@ aiOutputBox.style.pointerEvents = "none"; // Makes it read-only
 aiOutputBox.innerText = "AI-generated task plan will appear here...";
 aiOutputBox.style.display = "none"; // Hide it initially
 
+
 const registerContainer = document.createElement("div");
 registerContainer.style.width = "300px";
 registerContainer.style.margin = "100px auto";
@@ -111,6 +114,8 @@ registerContainer.style.display = "flex";
 registerContainer.style.flexDirection = "column";
 registerContainer.style.gap = "10px";
 registerContainer.style.display = "none";
+
+
 
 // ----- Toolbar (Logout & Save Buttons) -----
 const toolbar = document.createElement("div");
@@ -180,6 +185,7 @@ notepadArea.style.overflowY = "auto";
 notepadArea.style.color = "#333"; // Ensures text is visible
 notepadArea.style.backgroundColor = "#fff"; // Ensures a white background
 
+
 // Handle Enter Key for Task Creation
 taskInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
@@ -230,6 +236,7 @@ function insertTask(taskText) {
     notepadArea.appendChild(taskLine);
 }
 
+
 // ----- Create Generate Breaks Button -----
 const generateBreaksBtn = document.createElement("button");
 generateBreaksBtn.innerText = "Generate Breaks";
@@ -240,6 +247,8 @@ generateBreaksBtn.style.borderRadius = "5px";
 generateBreaksBtn.style.marginBottom = "10px";
 generateBreaksBtn.style.display = "none";
 generateBreaksBtn.style.width = "100%";
+
+
 
 // Attach an event listener to call your break generation function
 generateBreaksBtn.addEventListener("click", () => {
@@ -263,10 +272,8 @@ aiOutputContainer.appendChild(generateBreaksBtn);
 aiOutputContainer.appendChild(aiOutputBox);
 
 // ----- Create Task Manager Wrapper -----
-// (Replace the existing wrapper code with this updated block)
 const taskManagerWrapper = document.createElement("div");
 taskManagerWrapper.style.display = "flex";
-taskManagerWrapper.style.alignItems = "flex-start"; // Align children at the top
 taskManagerWrapper.style.width = "90%";
 taskManagerWrapper.style.maxWidth = "900px"; // Adjust as needed
 taskManagerWrapper.style.gap = "20px"; // Space between the two sections
@@ -274,9 +281,6 @@ taskManagerWrapper.style.gap = "20px"; // Space between the two sections
 // Set flex properties to determine space allocation
 notepadContainer.style.flex = "2"; // Takes more space
 aiOutputContainer.style.flex = "1"; // Takes less space
-
-// Remove any extra top margin from the output container
-aiOutputContainer.style.marginTop = "0";
 
 // Append both containers as siblings to the wrapper
 taskManagerWrapper.appendChild(notepadContainer);
@@ -307,7 +311,7 @@ registerPasswordInput.placeholder = "Enter password";
 registerPasswordInput.style.padding = "10px";
 
 const registerBtn = document.createElement("button");
-registerBtn.innerText = "Register";
+registerBtn.innerText = "Register New User";
 registerBtn.style.padding = "10px";
 registerBtn.style.backgroundColor = "#28a745";
 registerBtn.style.color = "white";
