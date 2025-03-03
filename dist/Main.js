@@ -89,7 +89,7 @@ notepadContainer.style.display = "none";
 // ----- AI Output Box -----
 const aiOutputBox = document.createElement("div");
 aiOutputBox.id = "aiOutputBox";
-aiOutputBox.style.width = "40%";
+aiOutputBox.style.width = "100%";
 aiOutputBox.style.minHeight = "400px";
 aiOutputBox.style.border = "2px solid #ccc";
 aiOutputBox.style.borderRadius = "8px";
