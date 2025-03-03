@@ -152,13 +152,10 @@ const TOGETHER_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
 
 // AI Route: Generate a response from Together AI
 app.post('/ai', async (req, res) => {
-    const { prompt } = req.body;
-    console.log("Received AI request with prompt:", prompt); // Debugging log
+    console.log("AI request received...");
 
-    if (!prompt) {
-        console.log("Error: No prompt received");
-        return res.status(400).send("Prompt is required.");
-    }
+    // Set the fixed prompt for AI (users can't change it)
+    const fixedPrompt = "Analyze the user's tasks and suggest break times efficiently.";
 
     try {
         const response = await fetch("https://api.together.xyz/v1/chat/completions", {
@@ -169,21 +166,21 @@ app.post('/ai', async (req, res) => {
             },
             body: JSON.stringify({
                 model: TOGETHER_MODEL,
-                messages: [{ role: "user", content: prompt }],
+                messages: [{ role: "user", content: fixedPrompt }],
                 max_tokens: 200
             })
         });
 
-        console.log("Request sent to Together AI...");
+        console.log("Request sent to AI...");
 
         const data = await response.json();
-        console.log("Received response:", data);
+        console.log("AI Response:", data);
 
         if (data.choices && data.choices.length > 0) {
             res.json({ response: data.choices[0].message.content });
         } else {
-            console.log("Error: No choices returned from Together AI");
-            res.status(500).send("Failed to get a response from Together AI.");
+            console.log("Error: AI returned no choices");
+            res.status(500).send("Failed to get a response from AI.");
         }
     } catch (error) {
         console.error("AI API error:", error);
