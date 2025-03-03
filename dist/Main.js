@@ -60,7 +60,6 @@ loginImage.style.display = "block"; // Ensures it centers properly
 loginImage.style.borderRadius = "10px"; // Optional: rounded corners
 
 // Insert the image at the top of loginContainer
-loginContainer.appendChild(loginImage); // This adds the image at the bottom
 loginContainer.insertBefore(loginImage, loginContainer.firstChild); // Moves it to the top
 
 
