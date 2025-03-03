@@ -1,8 +1,9 @@
+import { marked } from 'marked';
+
 // ==========================
 // Global Variables
 // ==========================
 let currentUser = null;
-import { marked } from 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
 // ==========================
 // Create Containers
 // ==========================
