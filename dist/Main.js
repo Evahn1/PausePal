@@ -30,18 +30,11 @@ const loginEmailInput = document.createElement("input");
 loginEmailInput.type = "email";
 loginEmailInput.placeholder = "Enter email";
 loginEmailInput.style.padding = "10px";
-loginEmailInput.style.position = "relative";
-loginEmailInput.style.zIndex = "10";
-loginEmailInput.style.backgroundColor = "#fff"; // Ensures a solid white background
-
 
 const loginPasswordInput = document.createElement("input");
 loginPasswordInput.type = "password";
 loginPasswordInput.placeholder = "Enter password";
 loginPasswordInput.style.padding = "10px";
-loginPasswordInput.style.position = "relative";
-loginPasswordInput.style.zIndex = "10";
-loginPasswordInput.style.backgroundColor = "#fff"; // Ensures a solid white background
 
 // Login Buttons
 const loginBtn = document.createElement("button");
@@ -67,6 +60,7 @@ loginImage.style.display = "block"; // Ensures it centers properly
 loginImage.style.borderRadius = "10px"; // Optional: rounded corners
 
 // Insert the image at the top of loginContainer
+loginContainer.appendChild(loginImage); // This adds the image at the bottom
 loginContainer.insertBefore(loginImage, loginContainer.firstChild); // Moves it to the top
 
 
@@ -234,6 +228,8 @@ generateBreaksBtn.style.backgroundColor = "#007bff";
 generateBreaksBtn.style.color = "white";
 generateBreaksBtn.style.borderRadius = "5px";
 generateBreaksBtn.style.marginBottom = "10px";
+generateBreaksBtn.style.display = "none";
+
 
 // Attach an event listener to call your break generation function
 generateBreaksBtn.addEventListener("click", () => {
@@ -392,6 +388,7 @@ function loadTaskEditor() {
     registerContainer.style.display = "none";
     notepadContainer.style.display = "flex";
     aiOutputBox.style.display = "block";
+    generateBreaksBtn.style.display = "block";  // Show the button when logged in
     taskInput.focus();
 }
 
@@ -402,9 +399,9 @@ function logout() {
     currentUser = null;
     notepadContainer.style.display = "none";
     aiOutputBox.style.display = "none"; // Hide AI output box when logging out
+    generateBreaksBtn.style.display = "none"; // Hide the Generate Breaks button on logout
     loginContainer.style.display = "flex";
 }
-
 
 // ==========================
 // Server Interaction Functions
