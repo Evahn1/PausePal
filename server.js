@@ -153,8 +153,10 @@ const TOGETHER_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
 // AI Route: Generate a response from Together AI
 app.post('/ai', async (req, res) => {
     const { prompt } = req.body;
+    console.log("Received AI request with prompt:", prompt); // Debugging log
 
     if (!prompt) {
+        console.log("Error: No prompt received");
         return res.status(400).send("Prompt is required.");
     }
 
@@ -172,11 +174,15 @@ app.post('/ai', async (req, res) => {
             })
         });
 
+        console.log("Request sent to Together AI...");
+
         const data = await response.json();
+        console.log("Received response:", data);
 
         if (data.choices && data.choices.length > 0) {
             res.json({ response: data.choices[0].message.content });
         } else {
+            console.log("Error: No choices returned from Together AI");
             res.status(500).send("Failed to get a response from Together AI.");
         }
     } catch (error) {
@@ -184,6 +190,7 @@ app.post('/ai', async (req, res) => {
         res.status(500).send("Error processing AI request.");
     }
 });
+
 
 // Simple test endpoint
 app.get("/", (req, res) => {

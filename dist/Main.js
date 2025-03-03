@@ -282,11 +282,6 @@ Adjust the schedule if necessary and explain your reasoning.`;
 }
 
 
-function generateBreaks() {
-    // Your logic for generating breaks goes here.
-    aiOutputBox.innerText = "Breaks generated: [insert break plan here]";
-}
-
 // ----- Create AI Output Container -----
 const aiOutputContainer = document.createElement("div");
 aiOutputContainer.style.width = "40%";
