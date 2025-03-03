@@ -151,22 +151,40 @@ app.post('/loadNotes', async (req, res) => {
     }
 });
 
-// AI Route: Generate a response from Google Gemini AI
-app.post('/ai', async (req, res) => {
+// NEW AI Route: Process tasks using Google Gemini AI
+app.post('/process-tasks', async (req, res) => {
     console.log("AI request received...");
 
-    // Set the fixed prompt for AI (users can't change it)
-    const fixedPrompt = "Analyze the user's tasks and suggest break times efficiently.";
+    // Expect an array of tasks from the frontend
+    const { tasks } = req.body;
+    if (!tasks || !Array.isArray(tasks)) {
+        return res.status(400).send("Tasks are required and should be an array.");
+    }
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        const result = await model.generateContent(fixedPrompt);
-        const response = result.response.text();
+        // Define your fixed parameters
+        const fixedBreakFrequency = "every 60 minutes";
+        const fixedBreakDuration = "5 minutes";
 
-        res.json({ response });
+        // Build a prompt that includes the tasks and the fixed parameters
+        const prompt = `Analyze the following tasks and suggest a break schedule.
+Use a break frequency of ${fixedBreakFrequency} and a break duration of ${fixedBreakDuration}.
+Tasks:
+${tasks.join('\n')}`;
+
+        // Generate text using Google Gemini
+        const response = await model.generateText({ prompt, max_tokens: 200 });
+
+        if (response && response.candidates && response.candidates.length > 0) {
+            // Send back the AI-generated suggestions
+            res.json({ suggestions: response.candidates[0].output });
+        } else {
+            console.error("Error: Gemini AI returned no candidates");
+            res.status(500).send("Failed to get a response from Gemini AI.");
+        }
     } catch (error) {
-        console.error("AI API error:", error);
-        res.status(500).send("Error processing AI request.");
+        console.error("Gemini API error:", error);
+        res.status(500).send("Error processing tasks with Gemini AI.");
     }
 });
 

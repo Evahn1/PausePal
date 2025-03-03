@@ -255,31 +255,34 @@ generateBreaksBtn.style.width = "100%";
 
 
 // Attach an event listener to call your break generation function
-function generateBreaks() {
-    // Extract tasks from the notepad area
+ffunction generateBreaks() {
+    // Extract tasks from the notepad area as text
     const tasksText = notepadArea.innerText.trim();
+    if (!tasksText) {
+        aiOutputBox.innerText = "No tasks found.";
+        return;
+    }
 
-    // Build the prompt using fixed parameters
-    const prompt = `I have the following tasks: ${tasksText}. 
-Based on these tasks, suggest a break schedule with breaks ${BREAK_FREQUENCY} and each lasting ${BREAK_DURATION}. 
-Adjust the schedule if necessary and explain your reasoning.`;
+    // Split tasks by newline (or use another delimiter as needed)
+    const tasks = tasksText.split('\n').filter(task => task.trim() !== "");
 
-    // Send the prompt to your server's AI endpoint
-    fetch('https://pausepal.onrender.com/ai', {
+    // Send the tasks array to the server's AI endpoint
+    fetch('https://pausepal.onrender.com/process-tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ tasks })
     })
         .then(response => response.json())
         .then(data => {
-            // Update the AI output box with the response from Together.AI
-            aiOutputBox.innerText = data.response;
+            // Update the AI output box with the suggestions from Gemini AI
+            aiOutputBox.innerText = data.suggestions;
         })
         .catch(err => {
             console.error("Error generating breaks:", err);
             aiOutputBox.innerText = "Error generating break plan. Please try again.";
         });
 }
+
 
 
 // ----- Create AI Output Container -----
