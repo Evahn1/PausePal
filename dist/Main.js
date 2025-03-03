@@ -155,6 +155,23 @@ taskInput.style.marginBottom = "10px";
 taskInput.style.border = "1px solid #ccc";
 taskInput.style.borderRadius = "5px";
 
+// ----- Create Task Button -----
+const createTaskBtn = document.createElement("button");
+createTaskBtn.innerText = "Create Task";
+createTaskBtn.style.padding = "10px";
+createTaskBtn.style.backgroundColor = "#007bff";
+createTaskBtn.style.color = "white";
+createTaskBtn.style.borderRadius = "5px";
+createTaskBtn.style.marginBottom = "10px";
+createTaskBtn.style.width = "100%";  // Makes the button fill its container
+
+createTaskBtn.addEventListener("click", () => {
+    if (taskInput.value.trim() !== "") {
+        insertTask(taskInput.value);
+        taskInput.value = "";
+    }
+});
+
 // ----- Notepad Area -----
 const notepadArea = document.createElement("div");
 notepadArea.id = "notepadArea";
@@ -272,12 +289,9 @@ taskManagerWrapper.appendChild(aiOutputContainer);
 // Append the task manager wrapper to the body
 document.body.appendChild(taskManagerWrapper);
 
-
-
-
-
 // Append elements to Notepad Container
 notepadContainer.appendChild(toolbar);
+notepadContainer.appendChild(createTaskBtn); // New button added here
 notepadContainer.appendChild(taskInput);
 notepadContainer.appendChild(notepadArea);
 
