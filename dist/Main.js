@@ -210,10 +210,11 @@ function insertTask(taskText) {
         taskSpan.style.textDecoration = checkbox.checked ? "line-through" : "none";
     });
 
-    // Create editable task text
+    // Create editable task text and add a class for later selection
     const taskSpan = document.createElement("span");
     taskSpan.textContent = taskText;
     taskSpan.contentEditable = "true";
+    taskSpan.classList.add("task-text"); // <-- Added class for reattaching listeners later
     taskSpan.style.flexGrow = "1";
     taskSpan.style.borderBottom = "1px solid transparent";
     taskSpan.style.padding = "5px";
@@ -233,6 +234,7 @@ function insertTask(taskText) {
     // Append task container to the notepad area
     notepadArea.appendChild(taskLine);
 }
+
 
 // ----- Create Generate Breaks Button -----
 const generateBreaksBtn = document.createElement("button");
@@ -368,8 +370,18 @@ loginBtn.addEventListener("click", async () => {
             .then(response => response.text())
             .then(notes => {
                 notepadArea.innerHTML = notes;
+                // Reattach backspace event listener to each loaded task
+                document.querySelectorAll('#notepadArea .task-text').forEach(taskSpan => {
+                    taskSpan.addEventListener("keydown", (e) => {
+                        if (e.key === "Backspace" && taskSpan.innerText.trim() === "") {
+                            e.preventDefault();
+                            taskSpan.parentElement.remove();
+                        }
+                    });
+                });
                 loadTaskEditor();
             })
+
             .catch(err => {
                 console.error("Failed to load notes:", err);
                 loadTaskEditor();
@@ -434,6 +446,7 @@ function logout() {
     notepadArea.innerHTML = "";
     loginEmailInput.value = "";
     loginPasswordInput.value = "";
+    aiOutputBox.value = "";
     currentUser = null;
     notepadContainer.style.display = "none";
     aiOutputBox.style.display = "none"; // Hide AI output box when logging out
