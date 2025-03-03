@@ -162,51 +162,55 @@ app.post('/process-tasks', async (req, res) => {
 
     try {
         const prompt = `
-You are a **schedule management assistant**. Your job is to take a list of tasks and create a **detailed daily schedule** that includes work sessions and breaks.  
-For every **45 minutes of work, insert a 5-minute break**.  
+You are a schedule management assistant. Your task is to generate a well-structured daily schedule based on the provided list of tasks. 
 
-### **Formatting Instructions (Follow exactly):**  
-- Do **not** output raw JSON.  
-- Format the schedule as **plain text** using **clear headings** and structured bullet points.  
-- **Each task must include:**  
-  - Start and end times.  
-  - A brief description.  
-- **Breaks must be clearly marked** (e.g., `🚀 Break Time!`).  
-- **Divide the day into sections** (Morning, Afternoon, Evening).  
+### **Schedule Guidelines:**  
+- **Each task must have a clear time range (start and end time)**  
+- **For every 45 minutes of work, insert a 5-minute break**  
+- **Divide the schedule into Morning, Afternoon, and Evening sections**  
+- **Use structured bullet points for clarity**  
+- **Clearly mark break times with "Break Time"**  
+- **Avoid unnecessary text, only output the schedule**  
 
 ---
 
 ## **Today's Schedule**  
 
-### **Morning Schedule**  
-🕒 **9:00 AM - 9:15 AM:** **Clean Room**  
-- **Task:** Quickly tidy up the room.  
+### **Morning**  
+- **9:00 AM - 9:15 AM:** Clean Room  
+  - Task: Quickly tidy up the room.  
 
-🕒 **9:15 AM - 9:35 AM:** **Dance Party**  
-- **Task:** Enjoy 20 minutes of dancing and fun.  
+- **9:15 AM - 9:35 AM:** Dance Party  
+  - Task: Enjoy 20 minutes of dancing.  
 
-### **Focused Work Sessions**  
-🕒 **9:35 AM - 12:35 PM:** **Do Taxes**  
-- **9:35 AM - 10:20 AM:** Work Session 1 - Focus on gathering tax documents.  
-- 🚀 **10:20 AM - 10:25 AM:** **Break Time!** Stretch, grab a drink.  
-- **10:25 AM - 11:10 AM:** Work Session 2 - Continue entering data.  
-- 🚀 **11:10 AM - 11:15 AM:** **Break Time!** Walk, listen to music.  
-- **11:15 AM - 12:00 PM:** Work Session 3 - Review and check for errors.  
-- 🚀 **12:00 PM - 12:05 AM:** **Break Time!** Stretch, step outside.  
-- **12:05 PM - 12:35 PM:** Work Session 4 - Final review and submission.  
+### **Work Sessions**  
+- **9:35 AM - 10:20 AM:** Work Session 1 - Taxes  
+  - Task: Gather tax documents.  
+- **10:20 AM - 10:25 AM:** Break Time  
+
+- **10:25 AM - 11:10 AM:** Work Session 2 - Taxes  
+  - Task: Enter financial data.  
+- **11:10 AM - 11:15 AM:** Break Time  
+
+- **11:15 AM - 12:00 PM:** Work Session 3 - Taxes  
+  - Task: Review and double-check entries.  
+- **12:00 PM - 12:05 PM:** Break Time  
+
+- **12:05 PM - 12:35 PM:** Work Session 4 - Taxes  
+  - Task: Final review and submission.  
 
 ---
 
 Here are the tasks for today:  
 ${tasks.map((task, index) => `${index + 1}. ${task}`).join('\n')}
 
-Please generate a schedule following the **exact** formatting above.
+Please generate a schedule following the exact format above.
         `;
 
         const response = await model.generateContent(prompt);
-        const text = response?.response?.text(); // Extract response text
+        const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-        if (text) {
+        if (text.trim()) {
             res.json({ suggestions: text });
         } else {
             console.error("Error: Gemini AI returned an empty response");
@@ -218,12 +222,10 @@ Please generate a schedule following the **exact** formatting above.
     }
 });
 
-
-
-
 // Simple test endpoint
 app.get("/", (req, res) => {
     res.send("Server is running!");
 });
+
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
