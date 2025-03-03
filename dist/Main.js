@@ -255,7 +255,7 @@ generateBreaksBtn.style.width = "100%";
 
 
 // Attach an event listener to call your break generation function
-ffunction generateBreaks() {
+function generateBreaks() {
     // Extract tasks from the notepad area as text
     const tasksText = notepadArea.innerText.trim();
     if (!tasksText) {
