@@ -1,4 +1,3 @@
-
 // ==========================
 // Global Variables
 // ==========================
@@ -272,7 +271,7 @@ function generateBreaks() {
         .then(response => response.json())
         .then(data => {
             // Convert markdown in data.suggestions to HTML
-            aiOutputBox.innerHTML = marked(data.suggestions);
+            aiOutputBox.innerHTML = marked.parse(data.suggestions);
         })
         .catch(err => {
             console.error("Error generating breaks:", err);
@@ -281,8 +280,6 @@ function generateBreaks() {
             aiOutputBox.innerText = `Error: ${err.message || "An unknown error occurred"}`;
         });
 }
-
-
 
 
 // ----- Create AI Output Container -----
