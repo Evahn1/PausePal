@@ -8,6 +8,10 @@ let currentUser = null;
 // ==========================
 
 
+const BREAK_FREQUENCY = "every 60 minutes";
+const BREAK_DURATION = "5 minutes";
+
+
 // ----- Login Container -----
 const loginContainer = document.createElement("div");
 loginContainer.id = "loginContainer";
@@ -251,9 +255,32 @@ generateBreaksBtn.style.width = "100%";
 
 
 // Attach an event listener to call your break generation function
-generateBreaksBtn.addEventListener("click", () => {
-    generateBreaks();
-});
+function generateBreaks() {
+    // Extract tasks from the notepad area
+    const tasksText = notepadArea.innerText.trim();
+
+    // Build the prompt using fixed parameters
+    const prompt = `I have the following tasks: ${tasksText}. 
+Based on these tasks, suggest a break schedule with breaks ${BREAK_FREQUENCY} and each lasting ${BREAK_DURATION}. 
+Adjust the schedule if necessary and explain your reasoning.`;
+
+    // Send the prompt to your server's AI endpoint
+    fetch('https://pausepal.onrender.com/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Update the AI output box with the response from Together.AI
+            aiOutputBox.innerText = data.response;
+        })
+        .catch(err => {
+            console.error("Error generating breaks:", err);
+            aiOutputBox.innerText = "Error generating break plan. Please try again.";
+        });
+}
+
 
 function generateBreaks() {
     // Your logic for generating breaks goes here.
