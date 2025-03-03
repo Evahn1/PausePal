@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import fetch from 'node-fetch'; // Required for making API calls
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config(); // Load environment variables
 
@@ -15,6 +15,10 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 // Initialize Supabase client
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Initialize Google Gemini AI
+const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 app.use(cors());
 app.use(express.json());
@@ -92,7 +96,7 @@ app.post('/saveNotes', async (req, res) => {
         const userId = userData.user_id;
 
         // 2. Upsert notes
-        const { data: notesResult, error: notesError } = await supabase
+        const { error: notesError } = await supabase
             .from('notes')
             .upsert([{ user_id: userId, notes }], { onConflict: 'user_id' });
 
@@ -147,10 +151,7 @@ app.post('/loadNotes', async (req, res) => {
     }
 });
 
-const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY;
-const TOGETHER_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
-
-// AI Route: Generate a response from Together AI
+// AI Route: Generate a response from Google Gemini AI
 app.post('/ai', async (req, res) => {
     console.log("AI request received...");
 
@@ -158,36 +159,16 @@ app.post('/ai', async (req, res) => {
     const fixedPrompt = "Analyze the user's tasks and suggest break times efficiently.";
 
     try {
-        const response = await fetch("https://api.together.xyz/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${TOGETHER_API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: TOGETHER_MODEL,
-                messages: [{ role: "user", content: fixedPrompt }],
-                max_tokens: 200
-            })
-        });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const result = await model.generateContent(fixedPrompt);
+        const response = result.response.text();
 
-        console.log("Request sent to AI...");
-
-        const data = await response.json();
-        console.log("AI Response:", data);
-
-        if (data.choices && data.choices.length > 0) {
-            res.json({ response: data.choices[0].message.content });
-        } else {
-            console.log("Error: AI returned no choices");
-            res.status(500).send("Failed to get a response from AI.");
-        }
+        res.json({ response });
     } catch (error) {
         console.error("AI API error:", error);
         res.status(500).send("Error processing AI request.");
     }
 });
-
 
 // Simple test endpoint
 app.get("/", (req, res) => {
