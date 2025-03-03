@@ -155,14 +155,12 @@ app.post('/loadNotes', async (req, res) => {
 app.post('/process-tasks', async (req, res) => {
     console.log("AI request received...");
 
-    // Expect an array of tasks from the frontend
     const { tasks } = req.body;
     if (!tasks || !Array.isArray(tasks)) {
         return res.status(400).send("Tasks are required and should be an array.");
     }
 
     try {
-        // Build a prompt that instructs the AI to generate a human-friendly schedule.
         const prompt = `
 You are a schedule management assistant. Your job is to take a list of tasks and create a detailed daily schedule that includes work sessions and breaks. For every 45 minutes of work, include a 5-minute break. 
 
@@ -178,14 +176,14 @@ ${tasks.map((task, index) => `${index + 1}. ${task}`).join('\n')}
 Please generate a schedule that meets the above requirements.
         `;
 
-        // Generate text using Google Gemini
-        const response = await model.generateText({ prompt, max_tokens: 200 });
+        // FIXED: Use generateContent instead of generateText
+        const response = await model.generateContent(prompt);
+        const text = response?.response?.text(); // Extract response text
 
-        if (response && response.candidates && response.candidates.length > 0) {
-            // Send back the AI-generated suggestions in a readable text format
-            res.json({ suggestions: response.candidates[0].output });
+        if (text) {
+            res.json({ suggestions: text });
         } else {
-            console.error("Error: Gemini AI returned no candidates");
+            console.error("Error: Gemini AI returned an empty response");
             res.status(500).send("Failed to get a response from Gemini AI.");
         }
     } catch (error) {
@@ -193,6 +191,7 @@ Please generate a schedule that meets the above requirements.
         res.status(500).send("Error processing tasks with Gemini AI.");
     }
 });
+
 
 
 // Simple test endpoint
