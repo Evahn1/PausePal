@@ -247,7 +247,7 @@ generateBreaksBtn.style.marginBottom = "10px";
 generateBreaksBtn.style.display = "none";
 generateBreaksBtn.style.width = "100%";
 
-
+generateBreaksBtn.addEventListener("click", generateBreaks);
 
 // Attach an event listener to call your break generation function
 function generateBreaks() {
@@ -257,6 +257,9 @@ function generateBreaks() {
         aiOutputBox.innerText = "No tasks found.";
         return;
     }
+
+    // Immediately display a loading message
+    aiOutputBox.innerText = "Loading tasks...";
 
     // Split tasks by newline (or use another delimiter as needed)
     const tasks = tasksText.split('\n').filter(task => task.trim() !== "");
@@ -277,6 +280,7 @@ function generateBreaks() {
             aiOutputBox.innerText = "Error generating break plan. Please try again.";
         });
 }
+
 
 
 
