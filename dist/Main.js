@@ -271,8 +271,8 @@ function generateBreaks() {
     })
         .then(response => response.json())
         .then(data => {
-            // Update the AI output box with the suggestions from Gemini AI
-            aiOutputBox.innerText = data.suggestions;
+            // Convert markdown in data.suggestions to HTML
+            aiOutputBox.innerHTML = marked(data.suggestions);
         })
         .catch(err => {
             console.error("Error generating breaks:", err);
