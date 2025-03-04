@@ -163,6 +163,7 @@ app.post('/process-tasks', async (req, res) => {
     try {
         const prompt = `
 Ignore all preivous tasks/inputs in the chat
+If the output is very long shorten it down
 You are a **schedule management assistant**. Your job is to take a list of tasks and create a **detailed daily schedule** that includes work sessions and breaks.  
 For every **45 minutes of work, insert a 5-minute break**.  
 
