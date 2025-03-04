@@ -154,14 +154,15 @@ app.post('/loadNotes', async (req, res) => {
 
 app.post('/process-tasks', async (req, res) => {
     console.log("AI request received...");
-
-    const { tasks } = req.body;
+    // Create a new instance for a fresh conversation context
+            const freshModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });const { tasks } = req.body;
     if (!tasks || !Array.isArray(tasks)) {
         return res.status(400).send("Tasks are required and should be an array.");
     }
 
     try {
         const prompt = `
+Ignore all previous tasks
 You are a **schedule management assistant**. Your job is to take a list of tasks and create a **detailed daily schedule** that includes work sessions and breaks.  
 For every **45 minutes of work, insert a 5-minute break**.  
 

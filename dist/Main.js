@@ -93,7 +93,6 @@ aiOutputBox.style.minHeight = "400px";
 aiOutputBox.style.border = "2px solid #ccc";
 aiOutputBox.style.borderRadius = "8px";
 aiOutputBox.style.padding = "12px";
-aiOutputBox.style.backgroundColor = "#f9f9f9";
 aiOutputBox.style.overflowY = "auto";
 aiOutputBox.style.color = "#333";
 aiOutputBox.style.backgroundColor = "#fff";
